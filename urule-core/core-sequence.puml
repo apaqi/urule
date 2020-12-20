@@ -1,0 +1,44 @@
+@startuml
+''' http://archive.3zso.com/archives/plantuml-quickstart.html#sec-5-1
+actor user #red
+''' as 后面是别名
+'''  设置颜色
+participant KnowledgeSessionFactory as KnowledgeSessionFactory 
+participant KnowledgeSession as KnowledgeSession 
+participant Agenda as Agenda 
+
+user -> KnowledgeSessionFactory :newKnowledgeSession
+activate KnowledgeSessionFactory 
+user <--[#0000FF] KnowledgeSessionFactory:  KnowledgeSession
+activate user
+
+user -> KnowledgeSession: fireRules
+activate KnowledgeSession
+
+KnowledgeSession -> Agenda: execute
+activate Agenda
+
+Agenda -> RuleBox: execute
+activate RuleBox
+
+RuleBox -> Activation: execute
+activate Activation
+
+Activation -> KnowledgeSession: fireEvent
+activate KnowledgeSession
+
+Activation -> Action: execute
+activate Action
+
+Action -> KnowledgeSession: fireEvent
+activate KnowledgeSession
+
+Action --> Action: 各种action的处理
+activate Action
+
+'''设置箭头的颜色
+Activation <--[#0000FF] Action:  Response
+Agenda <--[#0000FF] Activation:  Response
+KnowledgeSession <--[#0000FF] Agenda:  Response
+user <--[#0000FF] KnowledgeSession:  Response
+@enduml

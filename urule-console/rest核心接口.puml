@@ -1,0 +1,21 @@
+@startmindmap
+* 资源
+** 库[保存统一用CommonServletHandler#saveFile]
+    *** 常量库
+    *** 变量库
+    *** 参数库
+    *** 动作库
+'''决策集信息'''
+** 决策集
+    *** 向导式决策集
+        **** 加载变量、行为、（已存在）决策集信息[CommonServletHandler#loadXml]
+        **** 加载函数信息[CommonServletHandler#loadFunctions]
+        **** 保存规则[CommonServletHandler#saveFile]
+    *** 脚本式决策集
+** 决策表
+** 决策树
+** 评分卡
+    *** <s>Raspmbc</s> => OSMC
+    *** <s>Raspyfi</s> => Volumio
+** 决策流
+@endmindmap

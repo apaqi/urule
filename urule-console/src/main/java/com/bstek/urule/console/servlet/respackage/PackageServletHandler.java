@@ -305,8 +305,14 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		httpSessionKnowledgeCache.put(req, KB_KEY, knowledgeBase);
 		return knowledgeBase;
 	}
-	
-	
+
+	/**
+	 * 保存知识包
+	 *
+	 * @param req
+	 * @param resp
+	 * @throws Exception
+	 */
 	public void saveResourcePackages(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String project=req.getParameter("project");
 		project=Utils.decodeURL(project);
