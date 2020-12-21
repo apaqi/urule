@@ -1,7 +1,86 @@
 @startuml
-Object <|-- ArrayList
 
-Object : equals()
-ArrayList : Object[] elementData
-ArrayList : size()
+class KnowledgeSessionFactory{
+  KnowledgeSession newKnowledgeSession()
+}
+
+interface EventManager{
+    void addEventListener(KnowledgeEventListener listener);
+	boolean removeEventListener(KnowledgeEventListener listener);
+	void fireEvent(KnowledgeEvent event);
+	List<KnowledgeEventListener> getKnowledgeEventListeners();
+}
+
+interface WorkingMemory{
+    boolean insert(Object fact);
+	void assertFact(Object fact);
+	boolean update(Object fact);
+	boolean retract(Object obj);
+	Object getParameter(String key);
+	Map<String,Object> getParameters();
+	List<Object> getAllFacts();
+	List<Object> getHistoryFacts();
+}
+
+interface KnowledgeSession{
+    RuleExecutionResponse fireRules();
+    FlowExecutionResponse startProcess();
+}
+class KnowledgeSessionImpl{
+    -private Agenda agenda;
+    RuleExecutionResponse fireRules();
+    FlowExecutionResponse startProcess();
+}
+class Agenda{
+ - List<RuleBox> ruleBoxes;
+ - List<RuleInfo> matchedRules;
+ RuleExecutionResponse execute(AgendaFilter filter,int max);
+}
+
+interface RuleBox{
+	List<RuleInfo> execute(AgendaFilter filter,int max,List<ActionValue> actionValues);
+	boolean add(Activation activation);
+	RuleBox next();
+	List<Rule> getRules();
+	void retract(Object obj);
+	void clean();
+}
+
+Abstract class AbstractRuleBox{
+    protected List<RuleInfo> executedRules;
+	protected Context context;
+	protected List<Rule> rules;
+
+	protected void retract(Object obj,List<Activation> activations)
+	protected boolean addActivation(Activation activation, List<Activation> list)
+	protected boolean activationShouldAdd(Activation activation)
+	protected List<Activation> reevaluate(Object obj,List<Activation> activations,EvaluationContext context)
+}
+
+class ActivationGroupRuleBox{
+
+}
+class ActivationRuleBox{
+
+}
+
+class AgendaGroupRuleBox{
+
+}
+'''todo '''
+interface KnowledgeEvent{
+    KnowledgeSession getKnowledgeSession();
+}
+
+KnowledgeSessionFactory --> KnowledgeSession
+WorkingMemory -->EventManager
+KnowledgeSession-->WorkingMemory
+KnowledgeSessionImpl --|> KnowledgeSession
+KnowledgeSessionImpl-->Agenda
+Agenda-->RuleBox
+AbstractRuleBox --|> RuleBox
+
+ActivationGroupRuleBox --> AbstractRuleBox
+ActivationRuleBox --> AbstractRuleBox
+AgendaGroupRuleBox --> AbstractRuleBox
 @enduml
