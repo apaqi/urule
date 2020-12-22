@@ -34,6 +34,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.bstek.urule.model.library.ResourceLibrary;
+import com.bstek.urule.model.library.action.ActionLibrary;
+import com.bstek.urule.model.library.constant.ConstantCategory;
+import com.bstek.urule.model.library.constant.ConstantLibrary;
+import com.bstek.urule.model.library.variable.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -69,8 +74,6 @@ import com.bstek.urule.console.servlet.RequestContext;
 import com.bstek.urule.model.GeneralEntity;
 import com.bstek.urule.model.flow.FlowDefinition;
 import com.bstek.urule.model.library.Datatype;
-import com.bstek.urule.model.library.variable.Variable;
-import com.bstek.urule.model.library.variable.VariableCategory;
 import com.bstek.urule.model.rule.RuleInfo;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.KnowledgeSession;
@@ -329,11 +332,49 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 * @param xml
 	 * @return com.bstek.urule.builder.KnowledgeBase
 	 */
-	private KnowledgeBase buildKnowledgeBaseByRuleJson(HttpServletRequest req, String xml) throws IOException{
+	private KnowledgeBase buildKnowledgeBaseByRuleXml(HttpServletRequest req, String xml) throws IOException{
 		/**
 		 * 2. 解析规则
 		 */
-		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(xml);
+		//依赖常量库
+		List<ConstantLibrary> constantLibraries = new ArrayList<>();
+		//依赖的springbean
+		List<ActionLibrary> actionLibraries = new ArrayList<>();
+		ActionLibrary actionLibrary = new ActionLibrary();
+		actionLibraries.add(actionLibrary);
+		//依赖的变量
+		List<VariableLibrary> variableLibraries = new ArrayList<>();
+		VariableLibrary variableLibrary = new VariableLibrary();
+
+		//依赖的变量->变量类型
+		List<VariableCategory> variableCategories = new ArrayList<>();
+		VariableCategory variableCategory = new VariableCategory();
+		variableCategory.setClazz("java.util.HashMap");
+		variableCategory.setName("参数");
+		variableCategory.setType(CategoryType.Clazz);
+
+		//依赖的变量->变量信息
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setAct(Act.InOut);
+		variable.setName("商品名称");
+		variable.setLabel("skuName");
+		variable.setType(Datatype.String);
+		variables.add(variable);
+
+		Variable variable2 = new Variable();
+		variable2.setAct(Act.InOut);
+		variable2.setName("商品id");
+		variable2.setLabel("skuId");
+		variable2.setType(Datatype.Long);
+		variables.add(variable2);
+
+		variableCategory.setVariables(variables);
+		variableCategories.add(variableCategory);
+		variableLibrary.setVariableCategories(variableCategories);
+		variableLibraries.add(variableLibrary);
+		ResourceLibrary resourceLibrary = new ResourceLibrary( variableLibraries, actionLibraries, constantLibraries);
+		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(xml, resourceLibrary);
 		/**
 		 * 3. 缓存
 		 */
@@ -592,10 +633,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
-		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
+		KnowledgeBase knowledgeBase= null;// (KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
 			//knowledgeBase=buildKnowledgeBase(req);
-			knowledgeBase=buildKnowledgeBaseByRuleJson(req, TEST_RULR_XML);
+			knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
@@ -792,5 +833,5 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	}
 
 	private final static String TEST_RULR_XML="<?xml version=\"1.0\" encoding=\"UTF-8\"?><rule-set><import-variable-library path=\"jcr:/demo/demo.vl.xml\"/><import-action-library path=\"jcr:/demo/actiondemo.al.xml\"/><remark><![CDATA[]]></remark><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><or><atom op=\"GreaterThen\"><left var-category=\"用户\" var=\"age\" var-label=\"年龄\" datatype=\"Integer\" type=\"variable\"></left><value  content=\"10\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" type=\"variable\"></left><value  content=\"wpx\" type=\"Input\" ></value></atom></or></if><then><console-print><value  content=\"123\" type=\"Input\" ></value></console-print></then><else></else></rule><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><and><atom op=\"Equals\"><left var-category=\"用户\" var=\"gender\" var-label=\"性别\" datatype=\"Boolean\" type=\"variable\"></left><value  content=\"true\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" var=\"mobile\" var-label=\"手机号\" datatype=\"String\" type=\"variable\"></left><value  content=\"153\" type=\"Input\" ></value></atom></and></if><then><console-print><value  content=\"2132134\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set>";
-	private final static String TEST_RULR_XML_V2="<?xml version=\"1.0\" encoding=\"UTF-8\"?><knowledge><variable-library><category name='部门bean' type='Custom' clazz='com.bstek.library.vars.Dept'><var act='InOut' name='deptManager' label='部门经理' type='Boolean'/><var act='InOut' name='deptName' label='部门名称' type='String'/><var act='InOut' name='deptNum' label='部门人员数' type='Boolean'/></category><category name='用户' type='Custom' clazz='com.bstek.library.vars.Customer'><var act='InOut' name='age' label='年龄' type='Integer'/><var act='InOut' name='birthday' label='出生日期' type='Date'/><var act='InOut' name='car' label='是否有车' type='Boolean'/><var act='InOut' name='gender' label='性别' type='Boolean'/><var act='InOut' name='house' label='是否有房' type='Boolean'/><var act='InOut' name='level' label='等级' type='Integer'/><var act='InOut' name='married' label='婚否' type='Boolean'/><var act='InOut' name='mobile' label='手机号' type='String'/><var act='InOut' name='name' label='名称' type='String'/></category></variable-library><action-library><spring-bean id='methodTest' name='com.bstek.library.action.MethodTest'><method name='方法1' method-name='evalTest'><parameter name='参数0' type='String'/></method><method name='打印内容' method-name='printContent'><parameter name='参数0' type='String'/><parameter name='参数1' type='Date'/></method><method name='测试Int' method-name='testInt'><parameter name='参数0' type='Integer'/><parameter name='参数1' type='Integer'/></method><method name='打印Customer' method-name='printUser'><parameter name='参数0' type='Object'/></method></spring-bean><spring-bean id='deptActionTest' name='com.bstek.library.action.DeptActionTest'><method name='是否有部门经理' method-name='hasDeptManage'><parameter name='参数0' type='String'/></method><method name='打印部门信息' method-name='printDept'><parameter name='参数0' type='Object'/></method></spring-bean></action-library><rule-set><import-variable-library path=\"jcr:/demo/demo.vl.xml\"/><import-action-library path=\"jcr:/demo/actiondemo.al.xml\"/><remark><![CDATA[]]></remark><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><or><atom op=\"GreaterThen\"><left var-category=\"用户\" var=\"age\" var-label=\"年龄\" datatype=\"Integer\" type=\"variable\"></left><value  content=\"10\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" type=\"variable\"></left><value  content=\"wpx\" type=\"Input\" ></value></atom></or></if><then><console-print><value  content=\"123\" type=\"Input\" ></value></console-print></then><else></else></rule><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><and><atom op=\"Equals\"><left var-category=\"用户\" var=\"gender\" var-label=\"性别\" datatype=\"Boolean\" type=\"variable\"></left><value  content=\"true\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" var=\"mobile\" var-label=\"手机号\" datatype=\"String\" type=\"variable\"></left><value  content=\"153\" type=\"Input\" ></value></atom></and></if><then><console-print><value  content=\"2132134\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set></knowledge>\n";
+	private final static String TEST_RULR_XML_V2="<?xml version=\"1.0\" encoding=\"UTF-8\"?><rule-set><remark><![CDATA[]]></remark><rule name=\"rule\"><remark><![CDATA[]]></remark><if><and><atom op=\"GreaterThen\"><left  var-category=\"参数\" var=\"商品id\" var-label=\"skuId\" datatype=\"Long\" type=\"parameter\"></left><value  content=\"10\" type=\"Input\" ></value></atom><or><atom op=\"Contain\"><left  var-category=\"参数\" var=\"商品名称\" var-label=\"skuName\" datatype=\"String\" type=\"parameter\"></left><value  content=\"测试\" type=\"Input\" ></value></atom></or></and></if><then><console-print><value  content=\"21321\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set>";
 }

@@ -219,14 +219,14 @@ public class KnowledgeBuilder extends AbstractBuilder {
     /**
      * @param xml
      * @return com.bstek.urule.builder.KnowledgeBase
-     * @Description 根据规则json文件生成知识包
+     * @Description 根据规则xml文件生成知识包
      * @Author wpx
      * @Date 2020/12/22 14:19
      */
-    public KnowledgeBase buildKnowledgeBase(String xml) throws IOException {
+    public KnowledgeBase buildKnowledgeBase(String xml, ResourceLibrary resourceLibrary) throws IOException {
         KnowledgePackageService knowledgePackageService = (KnowledgePackageService) applicationContext.getBean(KnowledgePackageService.BEAN_ID);
         List<Rule> rules = new ArrayList<Rule>();
-        Map<String, Library> libMap = new HashMap<String, Library>();
+       // Map<String, Library> libMap = new HashMap<String, Library>();
         Map<String, FlowDefinition> flowMap = new HashMap<String, FlowDefinition>();
         //循环调用resourceBuilders，解析xml到各类规则文件中
         Element root = parseResource(xml);
@@ -238,7 +238,7 @@ public class KnowledgeBuilder extends AbstractBuilder {
             ResourceType type = builder.getType();
             if (type.equals(ResourceType.RuleSet)) {
                 RuleSet ruleSet = (RuleSet) object;
-                addToLibraryMap(libMap, ruleSet.getLibraries());
+                //addToLibraryMap(libMap, ruleSet.getLibraries());
                 if (ruleSet.getRules() != null) {
                     List<Rule> ruleList = ruleSet.getRules();
                     rulesRebuilder.convertNamedJunctions(ruleList);
@@ -251,38 +251,38 @@ public class KnowledgeBuilder extends AbstractBuilder {
                 }
             } else if (type.equals(ResourceType.DecisionTree)) {
                 DecisionTree tree = (DecisionTree) object;
-                addToLibraryMap(libMap, tree.getLibraries());
+               // addToLibraryMap(libMap, tree.getLibraries());
                 RuleSet ruleSet = decisionTreeRulesBuilder.buildRules(tree);
-                addToLibraryMap(libMap, ruleSet.getLibraries());
+               // addToLibraryMap(libMap, ruleSet.getLibraries());
                 if (ruleSet.getRules() != null) {
                     rules.addAll(ruleSet.getRules());
                 }
             } else if (type.equals(ResourceType.DecisionTable)) {
                 DecisionTable table = (DecisionTable) object;
-                addToLibraryMap(libMap, table.getLibraries());
+                //addToLibraryMap(libMap, table.getLibraries());
                 List<Rule> tableRules = decisionTableRulesBuilder.buildRules(table);
                 rules.addAll(tableRules);
             } else if (type.equals(ResourceType.ScriptDecisionTable)) {
                 ScriptDecisionTable table = (ScriptDecisionTable) object;
                 RuleSet ruleSet = scriptDecisionTableRulesBuilder.buildRules(table);
-                addToLibraryMap(libMap, ruleSet.getLibraries());
+                //addToLibraryMap(libMap, ruleSet.getLibraries());
                 if (ruleSet.getRules() != null) {
                     rules.addAll(ruleSet.getRules());
                 }
             } else if (type.equals(ResourceType.Flow)) {
                 FlowDefinition fd = (FlowDefinition) object;
                 fd.initNodeKnowledgePackage(this, knowledgePackageService, dslRuleSetBuilder);
-                addToLibraryMap(libMap, fd.getLibraries());
+                //addToLibraryMap(libMap, fd.getLibraries());
                 flowMap.put(fd.getId(), fd);
             } else if (type.equals(ResourceType.Scorecard)) {
                 ScoreRule rule = (ScoreRule) object;
                 rules.add(rule);
-                addToLibraryMap(libMap, rule.getLibraries());
+                //addToLibraryMap(libMap, rule.getLibraries());
             }
             break;
         }
 
-        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(libMap.values());
+        //ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(libMap.values());
         buildLoopRules(rules, resourceLibrary);
         //构建Rete树
         Rete rete = reteBuilder.buildRete(rules, resourceLibrary);

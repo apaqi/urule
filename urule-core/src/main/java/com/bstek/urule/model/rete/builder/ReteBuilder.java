@@ -80,6 +80,13 @@ public class ReteBuilder implements ApplicationContextAware{
 		prevNode.addLine(terminalNode);
 	}
 
+	/**
+	 * 构造规则树
+	 *
+	 * @param context
+	 * @param criterion
+	 * @return
+	 */
 	public static BaseReteNode buildCriterion(BuildContext context,Criterion criterion) {
 		BaseReteNode prevNode=null;
 		for(CriterionBuilder criterionBuilder:criterionBuilders){
