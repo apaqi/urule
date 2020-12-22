@@ -116,7 +116,7 @@
 	<bean id="urule.cacheUtils" class="com.bstek.urule.runtime.cache.CacheUtils"></bean>
 	
 	<bean id="urule.fileResourceProvider" class="com.bstek.urule.builder.resource.FileResourceProvider"></bean>
-	
+
 	<bean id="urule.valueCompute" class="com.bstek.urule.runtime.rete.ValueCompute"></bean>
 
 	<bean id="urule.utils" class="com.bstek.urule.Utils">

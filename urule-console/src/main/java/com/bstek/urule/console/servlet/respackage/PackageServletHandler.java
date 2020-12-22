@@ -285,10 +285,19 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		httpSessionKnowledgeCache.put(req, VCS_KEY, vcs);
 		writeObjectToJson(resp, vcs);
 	}
-	
+
+	/**
+	 * 构造知识库
+	 * @param req
+	 * @return
+	 * @throws IOException
+	 */
 	private KnowledgeBase buildKnowledgeBase(HttpServletRequest req) throws IOException{
 		String files=req.getParameter("files");
 		files=Utils.decodeURL(files);
+		/**
+		 * 1. 解析req中规则文件名称及版本
+		 */
 		ResourceBase resourceBase=knowledgeBuilder.newResourceBase();
 		String[] paths=files.split(";");
 		for(String path:paths){
@@ -300,7 +309,34 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			}
 			resourceBase.addResource(path,version);
 		}
+		/**
+		 * 2. 解析规则
+		 */
 		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(resourceBase);
+		/**
+		 * 3. 缓存
+		 */
+		httpSessionKnowledgeCache.remove(req, KB_KEY);
+		httpSessionKnowledgeCache.put(req, KB_KEY, knowledgeBase);
+		return knowledgeBase;
+	}
+
+	/**
+	 * @Description 根据规则json文件生成知识包,参考常量：TEST_RULR_XML
+	 *
+	 * @Author wpx
+	 * @Date 2020/12/22 14:14
+	 * @param xml
+	 * @return com.bstek.urule.builder.KnowledgeBase
+	 */
+	private KnowledgeBase buildKnowledgeBaseByRuleJson(HttpServletRequest req, String xml) throws IOException{
+		/**
+		 * 2. 解析规则
+		 */
+		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(xml);
+		/**
+		 * 3. 缓存
+		 */
 		httpSessionKnowledgeCache.remove(req, KB_KEY);
 		httpSessionKnowledgeCache.put(req, KB_KEY, knowledgeBase);
 		return knowledgeBase;
@@ -556,9 +592,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
-		KnowledgeBase knowledgeBase=(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
+		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
-			knowledgeBase=buildKnowledgeBase(req);
+			//knowledgeBase=buildKnowledgeBase(req);
+			knowledgeBase=buildKnowledgeBaseByRuleJson(req, TEST_RULR_XML);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
@@ -753,4 +790,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	public String url() {
 		return "/packageeditor";
 	}
+
+	private final static String TEST_RULR_XML="<?xml version=\"1.0\" encoding=\"UTF-8\"?><rule-set><import-variable-library path=\"jcr:/demo/demo.vl.xml\"/><import-action-library path=\"jcr:/demo/actiondemo.al.xml\"/><remark><![CDATA[]]></remark><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><or><atom op=\"GreaterThen\"><left var-category=\"用户\" var=\"age\" var-label=\"年龄\" datatype=\"Integer\" type=\"variable\"></left><value  content=\"10\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" type=\"variable\"></left><value  content=\"wpx\" type=\"Input\" ></value></atom></or></if><then><console-print><value  content=\"123\" type=\"Input\" ></value></console-print></then><else></else></rule><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><and><atom op=\"Equals\"><left var-category=\"用户\" var=\"gender\" var-label=\"性别\" datatype=\"Boolean\" type=\"variable\"></left><value  content=\"true\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" var=\"mobile\" var-label=\"手机号\" datatype=\"String\" type=\"variable\"></left><value  content=\"153\" type=\"Input\" ></value></atom></and></if><then><console-print><value  content=\"2132134\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set>";
+	private final static String TEST_RULR_XML_V2="<?xml version=\"1.0\" encoding=\"UTF-8\"?><knowledge><variable-library><category name='部门bean' type='Custom' clazz='com.bstek.library.vars.Dept'><var act='InOut' name='deptManager' label='部门经理' type='Boolean'/><var act='InOut' name='deptName' label='部门名称' type='String'/><var act='InOut' name='deptNum' label='部门人员数' type='Boolean'/></category><category name='用户' type='Custom' clazz='com.bstek.library.vars.Customer'><var act='InOut' name='age' label='年龄' type='Integer'/><var act='InOut' name='birthday' label='出生日期' type='Date'/><var act='InOut' name='car' label='是否有车' type='Boolean'/><var act='InOut' name='gender' label='性别' type='Boolean'/><var act='InOut' name='house' label='是否有房' type='Boolean'/><var act='InOut' name='level' label='等级' type='Integer'/><var act='InOut' name='married' label='婚否' type='Boolean'/><var act='InOut' name='mobile' label='手机号' type='String'/><var act='InOut' name='name' label='名称' type='String'/></category></variable-library><action-library><spring-bean id='methodTest' name='com.bstek.library.action.MethodTest'><method name='方法1' method-name='evalTest'><parameter name='参数0' type='String'/></method><method name='打印内容' method-name='printContent'><parameter name='参数0' type='String'/><parameter name='参数1' type='Date'/></method><method name='测试Int' method-name='testInt'><parameter name='参数0' type='Integer'/><parameter name='参数1' type='Integer'/></method><method name='打印Customer' method-name='printUser'><parameter name='参数0' type='Object'/></method></spring-bean><spring-bean id='deptActionTest' name='com.bstek.library.action.DeptActionTest'><method name='是否有部门经理' method-name='hasDeptManage'><parameter name='参数0' type='String'/></method><method name='打印部门信息' method-name='printDept'><parameter name='参数0' type='Object'/></method></spring-bean></action-library><rule-set><import-variable-library path=\"jcr:/demo/demo.vl.xml\"/><import-action-library path=\"jcr:/demo/actiondemo.al.xml\"/><remark><![CDATA[]]></remark><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><or><atom op=\"GreaterThen\"><left var-category=\"用户\" var=\"age\" var-label=\"年龄\" datatype=\"Integer\" type=\"variable\"></left><value  content=\"10\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" type=\"variable\"></left><value  content=\"wpx\" type=\"Input\" ></value></atom></or></if><then><console-print><value  content=\"123\" type=\"Input\" ></value></console-print></then><else></else></rule><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><and><atom op=\"Equals\"><left var-category=\"用户\" var=\"gender\" var-label=\"性别\" datatype=\"Boolean\" type=\"variable\"></left><value  content=\"true\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" var=\"mobile\" var-label=\"手机号\" datatype=\"String\" type=\"variable\"></left><value  content=\"153\" type=\"Input\" ></value></atom></and></if><then><console-print><value  content=\"2132134\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set></knowledge>\n";
 }

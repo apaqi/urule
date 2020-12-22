@@ -29,11 +29,14 @@ import com.bstek.urule.model.rule.lhs.NamedItem;
 import com.bstek.urule.model.rule.lhs.NamedJunction;
 
 /**
+ * 符号：named-atom
  * @author Jacky.gao
  * @since 2014年12月23日
  */
 public class NamedJunctionParser extends CriterionParser {
 	private ValueParser valueParser;
+
+	@Override
 	public Criterion parse(Element element) {
 		NamedJunction junction=new NamedJunction();
 		junction.setReferenceName(element.attributeValue("reference-name"));

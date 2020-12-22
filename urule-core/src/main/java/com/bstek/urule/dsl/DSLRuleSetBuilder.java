@@ -41,6 +41,13 @@ public class DSLRuleSetBuilder implements ApplicationContextAware{
 	public static final String BEAN_ID="urule.dslRuleSetBuilder";
 	private Collection<ContextBuilder> contextBuilders;
 	private RulesRebuilder rulesRebuilder;
+
+	/**
+	 * DSL 规则set构造
+	 * @param script
+	 * @return
+	 * @throws IOException
+	 */
 	public RuleSet build(String script) throws IOException{
 		ANTLRInputStream antlrInputStream=new ANTLRInputStream(script);
 		RuleParserLexer lexer=new RuleParserLexer(antlrInputStream);

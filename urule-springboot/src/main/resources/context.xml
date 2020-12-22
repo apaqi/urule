@@ -6,6 +6,9 @@
 	">
 	<import resource="classpath:urule-console-context.xml"/>
 	<context:property-placeholder ignore-unresolvable="true" order="2" location="classpath:configure.properties"/>
+
 	<!--todo 考虑动态生成bean-->
 	<bean id="methodTest" class="com.bstek.library.action.MethodTest"/>
+	<bean id="deptActionTest" class="com.bstek.library.action.DeptActionTest"/>
+	<bean id="deptActionTest1" class="com.bstek.library.action.DeptActionTest"/>
 </beans>

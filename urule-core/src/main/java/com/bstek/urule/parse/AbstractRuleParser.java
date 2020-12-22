@@ -33,6 +33,7 @@ public abstract class AbstractRuleParser<T> implements Parser<T> {
 	protected LhsParser lhsParser;
 	protected RhsParser rhsParser;
 	private OtherParser otherParser;
+
 	public void parseRule(Rule rule,Element element) {
 		rule.setName(element.attributeValue("name"));
 		String salience=element.attributeValue("salience");

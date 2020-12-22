@@ -23,10 +23,13 @@ import com.bstek.urule.action.VariableAssignAction;
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rule.lhs.LeftType;
 /**
+ * 变量赋值
+ *
  * @author Jacky.gao
  * @since 2014年12月23日
  */
 public class VariableAssignActionParser extends ActionParser {
+	@Override
 	public Action parse(Element element) {
 		VariableAssignAction action=new VariableAssignAction();
 		String referenceName=element.attributeValue("reference-name");

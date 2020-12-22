@@ -24,6 +24,8 @@ import com.bstek.urule.action.ExecuteMethodAction;
 import com.bstek.urule.model.rule.Parameter;
 
 /**
+ * 方法解析
+ *
  * @author Jacky.gao
  * @since 2014年12月23日
  */

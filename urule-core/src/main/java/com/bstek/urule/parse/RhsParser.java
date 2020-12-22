@@ -28,6 +28,8 @@ import com.bstek.urule.action.Action;
 import com.bstek.urule.model.rule.Rhs;
 
 /**
+ * 解析动作
+ *
  * @author Jacky.gao
  * @since 2014年12月23日
  */
@@ -63,6 +65,14 @@ public class RhsParser implements Parser<Rhs>,ApplicationContextAware {
 	public Collection<ActionParser> getActionParsers() {
 		return actionParsers;
 	}
+
+	/**
+	 * 注入动作解析 ActionParser
+	 * 动作解析不用递归处理
+	 *
+	 * @param context
+	 * @throws BeansException
+	 */
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 		actionParsers=context.getBeansOfType(ActionParser.class).values();
 	}

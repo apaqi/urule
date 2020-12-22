@@ -40,6 +40,10 @@ public abstract class CriterionParser extends AbstractParser<Criterion> implemen
 			}
 			Element ele=(Element)obj;
 			String name=ele.getName();
+			/**
+			 * 递归核心，部分逻辑同LhsParser.parse
+			 * 递归element子元素，调用CriterionParser 接口去解析，再度回归
+			 */
 			for(CriterionParser parser:criterionParsers){
 				if(parser.support(name)){
 					if(list==null)list=new ArrayList<Criterion>();

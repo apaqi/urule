@@ -24,6 +24,12 @@ import com.bstek.urule.model.rule.Rule;
  * @since 2014年12月23日
  */
 public class RuleParser extends AbstractRuleParser<Rule> {
+	/**
+	 * 规则解析
+	 *
+	 * @param element
+	 * @return
+	 */
 	public Rule parse(Element element) {
 		Rule rule=new Rule();
 		parseRule(rule, element);

@@ -19,6 +19,8 @@ import com.bstek.urule.action.Action;
 
 
 /**
+ * 解析动作
+ *
  * @author Jacky.gao
  * @since 2014年12月23日
  */

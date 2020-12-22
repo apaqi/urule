@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 Bstek
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -49,169 +49,271 @@ import com.bstek.urule.runtime.service.KnowledgePackageService;
  * @author Jacky.gao
  * @since 2014年12月22日
  */
-public class KnowledgeBuilder extends AbstractBuilder{
-	private ResourceLibraryBuilder resourceLibraryBuilder;
-	private ReteBuilder reteBuilder;
-	private RulesRebuilder rulesRebuilder;
-	private DecisionTreeRulesBuilder decisionTreeRulesBuilder;
-	private DecisionTableRulesBuilder decisionTableRulesBuilder;
-	private ScriptDecisionTableRulesBuilder scriptDecisionTableRulesBuilder;
-	private DSLRuleSetBuilder dslRuleSetBuilder;
-	public static final String BEAN_ID="urule.knowledgeBuilder";
-	public KnowledgeBase buildKnowledgeBase(ResourceBase resourceBase) throws IOException{
-		KnowledgePackageService knowledgePackageService=(KnowledgePackageService)applicationContext.getBean(KnowledgePackageService.BEAN_ID);
-		List<Rule> rules=new ArrayList<Rule>();
-		Map<String,Library> libMap=new HashMap<String,Library>();
-		Map<String,FlowDefinition> flowMap=new HashMap<String,FlowDefinition>();
-		for(Resource resource:resourceBase.getResources()){
-			if(dslRuleSetBuilder.support(resource)){
-				RuleSet ruleSet=dslRuleSetBuilder.build(resource.getContent());
-				addToLibraryMap(libMap,ruleSet.getLibraries());
-				if(ruleSet.getRules()!=null){
-					rules.addAll(ruleSet.getRules());
-				}
-				continue;
-			}
-			Element root=parseResource(resource.getContent());
-			for(ResourceBuilder<?> builder:resourceBuilders){
-				if(!builder.support(root)){
-					continue;
-				}
-				Object object=builder.build(root);
-				ResourceType type=builder.getType();
-				if(type.equals(ResourceType.RuleSet)){
-					RuleSet ruleSet=(RuleSet)object;
-					addToLibraryMap(libMap,ruleSet.getLibraries());
-					if(ruleSet.getRules()!=null){
-						List<Rule> ruleList=ruleSet.getRules();
-						rulesRebuilder.convertNamedJunctions(ruleList);
-						for(Rule rule:ruleList){
-							if(rule.getEnabled()!=null && rule.getEnabled()==false){
-								continue;
-							}
-							rules.add(rule);							
-						}
-					}
-				}else if(type.equals(ResourceType.DecisionTree)){
-					DecisionTree tree=(DecisionTree)object;
-					addToLibraryMap(libMap,tree.getLibraries());
-					RuleSet ruleSet=decisionTreeRulesBuilder.buildRules(tree);
-					addToLibraryMap(libMap,ruleSet.getLibraries());
-					if(ruleSet.getRules()!=null){
-						rules.addAll(ruleSet.getRules());							
-					}
-				}else if(type.equals(ResourceType.DecisionTable)){
-					DecisionTable table=(DecisionTable)object;
-					addToLibraryMap(libMap,table.getLibraries());
-					List<Rule> tableRules=decisionTableRulesBuilder.buildRules(table);
-					rules.addAll(tableRules);
-				}else if(type.equals(ResourceType.ScriptDecisionTable)){
-					ScriptDecisionTable table=(ScriptDecisionTable)object;
-					RuleSet ruleSet=scriptDecisionTableRulesBuilder.buildRules(table);
-					addToLibraryMap(libMap,ruleSet.getLibraries());
-					if(ruleSet.getRules()!=null){
-						rules.addAll(ruleSet.getRules());
-					}
-				}else if(type.equals(ResourceType.Flow)){
-					FlowDefinition fd=(FlowDefinition)object;
-					fd.initNodeKnowledgePackage(this, knowledgePackageService, dslRuleSetBuilder);
-					addToLibraryMap(libMap,fd.getLibraries());
-					flowMap.put(fd.getId(), fd);
-				}else if(type.equals(ResourceType.Scorecard)){
-					ScoreRule rule=(ScoreRule)object;
-					rules.add(rule);
-					addToLibraryMap(libMap,rule.getLibraries());
-				}
-				break;
-			}
-		}
-		ResourceLibrary resourceLibrary=resourceLibraryBuilder.buildResourceLibrary(libMap.values());
-		buildLoopRules(rules, resourceLibrary);
-		Rete rete=reteBuilder.buildRete(rules, resourceLibrary);
-		return new KnowledgeBase(rete,flowMap,retriveNoLhsRules(rules));
-	}
-	
-	private void buildLoopRules(List<Rule> rules,ResourceLibrary resourceLibrary){
-		for(Rule rule:rules){
-			if(!(rule instanceof LoopRule)){
-				continue;
-			}
-			LoopRule loopRule=(LoopRule)rule;
-			List<Rule> ruleList=buildRules(loopRule);
-			Rete rete=reteBuilder.buildRete(ruleList, resourceLibrary);
-			KnowledgeBase base=new KnowledgeBase(rete);
-			KnowledgePackageWrapper knowledgeWrapper=new KnowledgePackageWrapper(base.getKnowledgePackage());
-			loopRule.setKnowledgePackageWrapper(knowledgeWrapper);
-		}
-	}
-	
-	private List<Rule> buildRules(LoopRule loopRule){
-		Rule rule=new Rule();
-		rule.setDebug(loopRule.getDebug());
-		rule.setName("loop-rule");
-		rule.setLhs(loopRule.getLhs());
-		rule.setRhs(loopRule.getRhs());
-		rule.setOther(loopRule.getOther());
-		List<Rule> rules=new ArrayList<Rule>();
-		rules.add(rule);
-		return rules;
-	}
-	public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet){
-		List<Rule> rules=new ArrayList<Rule>();
-		Map<String,Library> libMap=new HashMap<String,Library>();
-		addToLibraryMap(libMap,ruleSet.getLibraries());
-		if(ruleSet.getRules()!=null){
-			rules.addAll(ruleSet.getRules());
-		}
-		ResourceLibrary resourceLibrary=resourceLibraryBuilder.buildResourceLibrary(libMap.values());
-		Rete rete=reteBuilder.buildRete(rules, resourceLibrary);
-		return new KnowledgeBase(rete,null,retriveNoLhsRules(rules));
-	}
-	
-	private List<Rule> retriveNoLhsRules(List<Rule> rules) {
-		List<Rule> noLhsRules=new ArrayList<Rule>();
-		for(Rule rule:rules){
-			Lhs lhs=rule.getLhs();
-			if((rule instanceof LoopRule) || (lhs==null || lhs.getCriterion()==null)){
-				noLhsRules.add(rule);
-			}
-		}
-		return noLhsRules;
-	}
-	
-	private void addToLibraryMap(Map<String,Library> map,List<Library> libraries){
-		if(libraries==null){
-			return;
-		}
-		for(Library lib:libraries){
-			String path=lib.getPath();
-			if(map.containsKey(path)){
-				continue;
-			}
-			map.put(path, lib);
-		}
-	}
-	
-	public void setRulesRebuilder(RulesRebuilder rulesRebuilder) {
-		this.rulesRebuilder = rulesRebuilder;
-	}
-	
-	public void setReteBuilder(ReteBuilder reteBuilder) {
-		this.reteBuilder = reteBuilder;
-	}
-	public void setDecisionTableRulesBuilder(DecisionTableRulesBuilder decisionTableRulesBuilder) {
-		this.decisionTableRulesBuilder = decisionTableRulesBuilder;
-	}
-	public void setScriptDecisionTableRulesBuilder(ScriptDecisionTableRulesBuilder scriptDecisionTableRulesBuilder) {
-		this.scriptDecisionTableRulesBuilder = scriptDecisionTableRulesBuilder;
-	}
-	public void setDslRuleSetBuilder(DSLRuleSetBuilder dslRuleSetBuilder) {
-		this.dslRuleSetBuilder = dslRuleSetBuilder;
-	}
-	public void setResourceLibraryBuilder(ResourceLibraryBuilder resourceLibraryBuilder) {
-		this.resourceLibraryBuilder = resourceLibraryBuilder;
-	}
-	public void setDecisionTreeRulesBuilder(DecisionTreeRulesBuilder decisionTreeRulesBuilder) {
-		this.decisionTreeRulesBuilder = decisionTreeRulesBuilder;
-	}
+public class KnowledgeBuilder extends AbstractBuilder {
+    private ResourceLibraryBuilder resourceLibraryBuilder;
+    private ReteBuilder reteBuilder;
+    private RulesRebuilder rulesRebuilder;
+    private DecisionTreeRulesBuilder decisionTreeRulesBuilder;
+    private DecisionTableRulesBuilder decisionTableRulesBuilder;
+    private ScriptDecisionTableRulesBuilder scriptDecisionTableRulesBuilder;
+    private DSLRuleSetBuilder dslRuleSetBuilder;
+    public static final String BEAN_ID = "urule.knowledgeBuilder";
+
+    /**
+     * 根据资源文件构造知识包：
+     * 1.循环资源文件，使用com.bstek.urule.builder.resource.Resource接口实现
+     * 2.如果规则是UL(规则文本文件），直接加载。
+     * 3.其他均为xml定义，使用ResourceProvider加载文件或数据库中的xml文件
+     * 4.循环调用resourceBuilders，解析xml到各类规则文件中
+     * 5.构建Rete树
+     *
+     * @param resourceBase
+     * @return
+     * @throws IOException
+     */
+    public KnowledgeBase buildKnowledgeBase(ResourceBase resourceBase) throws IOException {
+        KnowledgePackageService knowledgePackageService = (KnowledgePackageService) applicationContext.getBean(KnowledgePackageService.BEAN_ID);
+        List<Rule> rules = new ArrayList<Rule>();
+        Map<String, Library> libMap = new HashMap<String, Library>();
+        Map<String, FlowDefinition> flowMap = new HashMap<String, FlowDefinition>();
+        //循环资源文件
+        for (Resource resource : resourceBase.getResources()) {
+            //如果规则是UL(规则文本文件），直接加载
+            if (dslRuleSetBuilder.support(resource)) {
+                RuleSet ruleSet = dslRuleSetBuilder.build(resource.getContent());
+                addToLibraryMap(libMap, ruleSet.getLibraries());
+                if (ruleSet.getRules() != null) {
+                    rules.addAll(ruleSet.getRules());
+                }
+                continue;
+            }
+            //循环调用resourceBuilders，解析xml到各类规则文件中
+            Element root = parseResource(resource.getContent());
+            for (ResourceBuilder<?> builder : resourceBuilders) {
+                if (!builder.support(root)) {
+                    continue;
+                }
+                Object object = builder.build(root);
+                ResourceType type = builder.getType();
+                if (type.equals(ResourceType.RuleSet)) {
+                    RuleSet ruleSet = (RuleSet) object;
+                    addToLibraryMap(libMap, ruleSet.getLibraries());
+                    if (ruleSet.getRules() != null) {
+                        List<Rule> ruleList = ruleSet.getRules();
+                        rulesRebuilder.convertNamedJunctions(ruleList);
+                        for (Rule rule : ruleList) {
+                            if (rule.getEnabled() != null && rule.getEnabled() == false) {
+                                continue;
+                            }
+                            rules.add(rule);
+                        }
+                    }
+                } else if (type.equals(ResourceType.DecisionTree)) {
+                    DecisionTree tree = (DecisionTree) object;
+                    addToLibraryMap(libMap, tree.getLibraries());
+                    RuleSet ruleSet = decisionTreeRulesBuilder.buildRules(tree);
+                    addToLibraryMap(libMap, ruleSet.getLibraries());
+                    if (ruleSet.getRules() != null) {
+                        rules.addAll(ruleSet.getRules());
+                    }
+                } else if (type.equals(ResourceType.DecisionTable)) {
+                    DecisionTable table = (DecisionTable) object;
+                    addToLibraryMap(libMap, table.getLibraries());
+                    List<Rule> tableRules = decisionTableRulesBuilder.buildRules(table);
+                    rules.addAll(tableRules);
+                } else if (type.equals(ResourceType.ScriptDecisionTable)) {
+                    ScriptDecisionTable table = (ScriptDecisionTable) object;
+                    RuleSet ruleSet = scriptDecisionTableRulesBuilder.buildRules(table);
+                    addToLibraryMap(libMap, ruleSet.getLibraries());
+                    if (ruleSet.getRules() != null) {
+                        rules.addAll(ruleSet.getRules());
+                    }
+                } else if (type.equals(ResourceType.Flow)) {
+                    FlowDefinition fd = (FlowDefinition) object;
+                    fd.initNodeKnowledgePackage(this, knowledgePackageService, dslRuleSetBuilder);
+                    addToLibraryMap(libMap, fd.getLibraries());
+                    flowMap.put(fd.getId(), fd);
+                } else if (type.equals(ResourceType.Scorecard)) {
+                    ScoreRule rule = (ScoreRule) object;
+                    rules.add(rule);
+                    addToLibraryMap(libMap, rule.getLibraries());
+                }
+                break;
+            }
+        }
+        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(libMap.values());
+        buildLoopRules(rules, resourceLibrary);
+        //构建Rete树
+        Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
+        return new KnowledgeBase(rete, flowMap, retriveNoLhsRules(rules));
+    }
+
+    private void buildLoopRules(List<Rule> rules, ResourceLibrary resourceLibrary) {
+        for (Rule rule : rules) {
+            if (!(rule instanceof LoopRule)) {
+                continue;
+            }
+            LoopRule loopRule = (LoopRule) rule;
+            List<Rule> ruleList = buildRules(loopRule);
+            Rete rete = reteBuilder.buildRete(ruleList, resourceLibrary);
+            KnowledgeBase base = new KnowledgeBase(rete);
+            KnowledgePackageWrapper knowledgeWrapper = new KnowledgePackageWrapper(base.getKnowledgePackage());
+            loopRule.setKnowledgePackageWrapper(knowledgeWrapper);
+        }
+    }
+
+    private List<Rule> buildRules(LoopRule loopRule) {
+        Rule rule = new Rule();
+        rule.setDebug(loopRule.getDebug());
+        rule.setName("loop-rule");
+        rule.setLhs(loopRule.getLhs());
+        rule.setRhs(loopRule.getRhs());
+        rule.setOther(loopRule.getOther());
+        List<Rule> rules = new ArrayList<Rule>();
+        rules.add(rule);
+        return rules;
+    }
+
+    /**
+     * @param ruleSet
+     * @return com.bstek.urule.builder.KnowledgeBase
+     * @Description 根据RuleSet构建知识包
+     * @Date 2020/12/22 14:17
+     */
+    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet) {
+        List<Rule> rules = new ArrayList<Rule>();
+        Map<String, Library> libMap = new HashMap<String, Library>();
+        addToLibraryMap(libMap, ruleSet.getLibraries());
+        if (ruleSet.getRules() != null) {
+            rules.addAll(ruleSet.getRules());
+        }
+        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(libMap.values());
+        Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
+        return new KnowledgeBase(rete, null, retriveNoLhsRules(rules));
+    }
+
+    private List<Rule> retriveNoLhsRules(List<Rule> rules) {
+        List<Rule> noLhsRules = new ArrayList<Rule>();
+        for (Rule rule : rules) {
+            Lhs lhs = rule.getLhs();
+            if ((rule instanceof LoopRule) || (lhs == null || lhs.getCriterion() == null)) {
+                noLhsRules.add(rule);
+            }
+        }
+        return noLhsRules;
+    }
+
+    private void addToLibraryMap(Map<String, Library> map, List<Library> libraries) {
+        if (libraries == null) {
+            return;
+        }
+        for (Library lib : libraries) {
+            String path = lib.getPath();
+            if (map.containsKey(path)) {
+                continue;
+            }
+            map.put(path, lib);
+        }
+    }
+
+    /**
+     * @param xml
+     * @return com.bstek.urule.builder.KnowledgeBase
+     * @Description 根据规则json文件生成知识包
+     * @Author wpx
+     * @Date 2020/12/22 14:19
+     */
+    public KnowledgeBase buildKnowledgeBase(String xml) throws IOException {
+        KnowledgePackageService knowledgePackageService = (KnowledgePackageService) applicationContext.getBean(KnowledgePackageService.BEAN_ID);
+        List<Rule> rules = new ArrayList<Rule>();
+        Map<String, Library> libMap = new HashMap<String, Library>();
+        Map<String, FlowDefinition> flowMap = new HashMap<String, FlowDefinition>();
+        //循环调用resourceBuilders，解析xml到各类规则文件中
+        Element root = parseResource(xml);
+        for (ResourceBuilder<?> builder : resourceBuilders) {
+            if (!(builder.support(root))) {
+                continue;
+            }
+            Object object = builder.build(root);
+            ResourceType type = builder.getType();
+            if (type.equals(ResourceType.RuleSet)) {
+                RuleSet ruleSet = (RuleSet) object;
+                addToLibraryMap(libMap, ruleSet.getLibraries());
+                if (ruleSet.getRules() != null) {
+                    List<Rule> ruleList = ruleSet.getRules();
+                    rulesRebuilder.convertNamedJunctions(ruleList);
+                    for (Rule rule : ruleList) {
+                        if (rule.getEnabled() != null && rule.getEnabled() == false) {
+                            continue;
+                        }
+                        rules.add(rule);
+                    }
+                }
+            } else if (type.equals(ResourceType.DecisionTree)) {
+                DecisionTree tree = (DecisionTree) object;
+                addToLibraryMap(libMap, tree.getLibraries());
+                RuleSet ruleSet = decisionTreeRulesBuilder.buildRules(tree);
+                addToLibraryMap(libMap, ruleSet.getLibraries());
+                if (ruleSet.getRules() != null) {
+                    rules.addAll(ruleSet.getRules());
+                }
+            } else if (type.equals(ResourceType.DecisionTable)) {
+                DecisionTable table = (DecisionTable) object;
+                addToLibraryMap(libMap, table.getLibraries());
+                List<Rule> tableRules = decisionTableRulesBuilder.buildRules(table);
+                rules.addAll(tableRules);
+            } else if (type.equals(ResourceType.ScriptDecisionTable)) {
+                ScriptDecisionTable table = (ScriptDecisionTable) object;
+                RuleSet ruleSet = scriptDecisionTableRulesBuilder.buildRules(table);
+                addToLibraryMap(libMap, ruleSet.getLibraries());
+                if (ruleSet.getRules() != null) {
+                    rules.addAll(ruleSet.getRules());
+                }
+            } else if (type.equals(ResourceType.Flow)) {
+                FlowDefinition fd = (FlowDefinition) object;
+                fd.initNodeKnowledgePackage(this, knowledgePackageService, dslRuleSetBuilder);
+                addToLibraryMap(libMap, fd.getLibraries());
+                flowMap.put(fd.getId(), fd);
+            } else if (type.equals(ResourceType.Scorecard)) {
+                ScoreRule rule = (ScoreRule) object;
+                rules.add(rule);
+                addToLibraryMap(libMap, rule.getLibraries());
+            }
+            break;
+        }
+
+        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(libMap.values());
+        buildLoopRules(rules, resourceLibrary);
+        //构建Rete树
+        Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
+        return new KnowledgeBase(rete, flowMap, retriveNoLhsRules(rules));
+    }
+
+    public void setRulesRebuilder(RulesRebuilder rulesRebuilder) {
+        this.rulesRebuilder = rulesRebuilder;
+    }
+
+    public void setReteBuilder(ReteBuilder reteBuilder) {
+        this.reteBuilder = reteBuilder;
+    }
+
+    public void setDecisionTableRulesBuilder(DecisionTableRulesBuilder decisionTableRulesBuilder) {
+        this.decisionTableRulesBuilder = decisionTableRulesBuilder;
+    }
+
+    public void setScriptDecisionTableRulesBuilder(ScriptDecisionTableRulesBuilder scriptDecisionTableRulesBuilder) {
+        this.scriptDecisionTableRulesBuilder = scriptDecisionTableRulesBuilder;
+    }
+
+    public void setDslRuleSetBuilder(DSLRuleSetBuilder dslRuleSetBuilder) {
+        this.dslRuleSetBuilder = dslRuleSetBuilder;
+    }
+
+    public void setResourceLibraryBuilder(ResourceLibraryBuilder resourceLibraryBuilder) {
+        this.resourceLibraryBuilder = resourceLibraryBuilder;
+    }
+
+    public void setDecisionTreeRulesBuilder(DecisionTreeRulesBuilder decisionTreeRulesBuilder) {
+        this.decisionTreeRulesBuilder = decisionTreeRulesBuilder;
+    }
 }

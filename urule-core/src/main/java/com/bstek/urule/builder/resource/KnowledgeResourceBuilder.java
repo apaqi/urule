@@ -13,35 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.bstek.urule.parse;
+package com.bstek.urule.builder.resource;
 
+import com.bstek.urule.model.rule.RuleSet;
+import com.bstek.urule.parse.deserializer.KnowledgeDeserializer;
+import com.bstek.urule.parse.deserializer.RuleSetDeserializer;
 import org.dom4j.Element;
 
-import com.bstek.urule.action.Action;
-import com.bstek.urule.action.ConsolePrintAction;
-
 /**
- * 控制台
+ * @Description
  *
- * @author Jacky.gao
- * @since 2014年12月23日
+ * @Author wpx
+ * @Date 2020/12/22 17:06
  */
-public class ConsolePrintActionParser extends ActionParser {
-	public Action parse(Element element) {
-		ConsolePrintAction action=new ConsolePrintAction();
-		for(Object obj:element.elements()){
-			if(obj==null || !(obj instanceof Element)){
-				continue;
-			}
-			Element ele=(Element)obj;
-			if(valueParser.support(ele.getName())){
-				action.setValue(valueParser.parse(ele));
-				break;
-			}
-		}
-		return action;
+public class KnowledgeResourceBuilder implements ResourceBuilder<RuleSet> {
+	private KnowledgeDeserializer knowledgeDeserializer;
+	public RuleSet build(Element root) {
+		return knowledgeDeserializer.deserialize(root);
 	}
-	public boolean support(String name) {
-		return name.equals("console-print");
+	public boolean support(Element root) {
+		return knowledgeDeserializer.support(root);
+	}
+	public ResourceType getType() {
+		return ResourceType.RuleSet;
+	}
+
+	public void setKnowledgeDeserializer(KnowledgeDeserializer knowledgeDeserializer) {
+		this.knowledgeDeserializer = knowledgeDeserializer;
 	}
 }

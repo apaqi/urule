@@ -22,12 +22,15 @@ import com.bstek.urule.model.rule.lhs.Criteria;
 import com.bstek.urule.model.rule.lhs.Criterion;
 
 /**
+ * 原子条件处理器
+ * 符号：atom op="In"
  * @author Jacky.gao
  * @since 2014年12月23日
  */
 public class CriteriaParser extends CriterionParser {
 	private ValueParser valueParser;
 	private LeftParser leftParser;
+	@Override
 	public Criterion parse(Element element) {
 		Criteria criteria=new Criteria();
 		Op op=Op.valueOf(element.attributeValue("op"));

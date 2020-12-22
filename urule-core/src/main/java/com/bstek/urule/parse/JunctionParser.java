@@ -23,10 +23,20 @@ import com.bstek.urule.model.rule.lhs.And;
 import com.bstek.urule.model.rule.lhs.Criterion;
 import com.bstek.urule.model.rule.lhs.Or;
 /**
+ * 条件处理器
+ *符号：and 、or
  * @author Jacky.gao
  * @since 2014年12月23日
  */
 public class JunctionParser extends CriterionParser {
+	/**
+	 * 1.递归调用CriterionParser.parseCriterion 方法，处理元素递归解析
+	 * 2.处理and or 问题
+	 *
+	 * @param element
+	 * @return
+	 */
+	@Override
 	public Criterion parse(Element element) {
 		List<Criterion> list=parseCriterion(element);
 		if(list==null || list.size()==0){
