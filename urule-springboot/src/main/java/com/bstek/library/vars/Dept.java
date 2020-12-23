@@ -12,8 +12,8 @@ public class Dept {
     @Label("部门名称")
     private String deptName;
     @Label("部门经理")
-    private boolean deptManager;
+    private String deptManager;
     @Label("部门人员数")
-    private boolean deptNum;
+    private Integer deptNum;
 
 }

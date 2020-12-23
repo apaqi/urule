@@ -633,10 +633,11 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
-		KnowledgeBase knowledgeBase= null;// (KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
+		KnowledgeBase knowledgeBase= (KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
-			//knowledgeBase=buildKnowledgeBase(req);
-			knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
+			knowledgeBase=buildKnowledgeBase(req);
+			//todo 通过xml知识库测试代码
+			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
