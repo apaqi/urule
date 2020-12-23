@@ -20,25 +20,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.bstek.urule.model.library.ResourceLibrary;
-import com.bstek.urule.model.library.action.ActionLibrary;
-import com.bstek.urule.model.library.constant.ConstantCategory;
-import com.bstek.urule.model.library.constant.ConstantLibrary;
+import com.bstek.urule.BizUtils;
+import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.variable.*;
+import com.bstek.urule.model.rule.*;
+import com.bstek.urule.model.rule.lhs.And;
+import com.bstek.urule.model.rule.lhs.Lhs;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -74,7 +67,6 @@ import com.bstek.urule.console.servlet.RequestContext;
 import com.bstek.urule.model.GeneralEntity;
 import com.bstek.urule.model.flow.FlowDefinition;
 import com.bstek.urule.model.library.Datatype;
-import com.bstek.urule.model.rule.RuleInfo;
 import com.bstek.urule.runtime.KnowledgePackage;
 import com.bstek.urule.runtime.KnowledgeSession;
 import com.bstek.urule.runtime.KnowledgeSessionFactory;
@@ -333,54 +325,75 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 * @return com.bstek.urule.builder.KnowledgeBase
 	 */
 	private KnowledgeBase buildKnowledgeBaseByRuleXml(HttpServletRequest req, String xml) throws IOException{
-		/**
-		 * 2. 解析规则
-		 */
-		//依赖常量库
-		List<ConstantLibrary> constantLibraries = new ArrayList<>();
-		//依赖的springbean
-		List<ActionLibrary> actionLibraries = new ArrayList<>();
-		ActionLibrary actionLibrary = new ActionLibrary();
-		actionLibraries.add(actionLibrary);
-		//依赖的变量
-		List<VariableLibrary> variableLibraries = new ArrayList<>();
-		VariableLibrary variableLibrary = new VariableLibrary();
 
-		//依赖的变量->变量类型
-		List<VariableCategory> variableCategories = new ArrayList<>();
-		VariableCategory variableCategory = new VariableCategory();
-		variableCategory.setClazz("java.util.HashMap");
-		variableCategory.setName("参数");
-		variableCategory.setType(CategoryType.Clazz);
-
-		//依赖的变量->变量信息
-		List<Variable> variables = new ArrayList<>();
-		Variable variable = new Variable();
-		variable.setAct(Act.InOut);
-		variable.setName("商品名称");
-		variable.setLabel("skuName");
-		variable.setType(Datatype.String);
-		variables.add(variable);
-
-		Variable variable2 = new Variable();
-		variable2.setAct(Act.InOut);
-		variable2.setName("商品id");
-		variable2.setLabel("skuId");
-		variable2.setType(Datatype.Long);
-		variables.add(variable2);
-
-		variableCategory.setVariables(variables);
-		variableCategories.add(variableCategory);
-		variableLibrary.setVariableCategories(variableCategories);
-		variableLibraries.add(variableLibrary);
-		ResourceLibrary resourceLibrary = new ResourceLibrary( variableLibraries, actionLibraries, constantLibraries);
-		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(xml, resourceLibrary);
+		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(xml);
 		/**
 		 * 3. 缓存
 		 */
 		httpSessionKnowledgeCache.remove(req, KB_KEY);
 		httpSessionKnowledgeCache.put(req, KB_KEY, knowledgeBase);
 		return knowledgeBase;
+	}
+
+	/**
+	 * 根据规则集构造知识包
+	 */
+	private KnowledgeBase buildKnowledgeBaseByRuleSet(HttpServletRequest req){
+		RuleSet ruleSet = new RuleSet();
+		ruleSet.setRemark("RuleRegister");
+		ruleSet.setRules(Arrays.asList(this.buildRule()));
+		List<ActionConfig> actionConfigs = new ArrayList<>();
+		ActionConfig actionConfig = new ActionConfig();
+		actionConfig.setActionFlag("methodTest");
+		actionConfigs.add(actionConfig);
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("username");
+		variable.setName("username");
+		variables.add(variable);
+		KnowledgeBase knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, actionConfigs, variables);
+		/**
+		 * 3. 缓存
+		 */
+		httpSessionKnowledgeCache.remove(req, KB_KEY);
+		httpSessionKnowledgeCache.put(req, KB_KEY, knowledgeBase);
+		return knowledgeBase;
+	}
+
+
+
+	/**
+	 * 构建规则
+	 * @return
+	 */
+	private Rule buildRule() {
+		Rule rule = new Rule();
+		rule.setName("test001");
+		rule.setRemark("test001");
+		rule.setLhs(buildLhs());
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+		rule.setOther(other);
+		Rhs rhs = new Rhs();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+		rule.setRhs(rhs);
+		return rule;
+	}
+
+
+	/**
+	 * 构建左侧规则
+	 * @return
+	 */
+	private Lhs buildLhs(){
+		Lhs lhs = new Lhs();
+		And and = new And();
+		Parameter parameter = BizUtils.buildSimpleParameter("username", Datatype.String ,"123" );
+		and.addCriterion(BizUtils.buildMethodLeftCriteria("methodTest","evalTest",true, parameter));
+		lhs.setCriterion(and);
+		return lhs;
 	}
 
 	/**
@@ -633,11 +646,12 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
-		KnowledgeBase knowledgeBase= (KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
+		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
 			knowledgeBase=buildKnowledgeBase(req);
 			//todo 通过xml知识库测试代码
 			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
+			//knowledgeBase = buildKnowledgeBaseByRuleSet(req);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);

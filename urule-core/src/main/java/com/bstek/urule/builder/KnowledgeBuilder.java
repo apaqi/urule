@@ -21,6 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.bstek.urule.model.library.Datatype;
+import com.bstek.urule.model.library.action.ActionConfig;
+import com.bstek.urule.model.library.action.ActionLibrary;
+import com.bstek.urule.model.library.constant.ConstantLibrary;
+import com.bstek.urule.model.library.variable.*;
 import org.dom4j.Element;
 
 import com.bstek.urule.builder.resource.Resource;
@@ -192,6 +197,23 @@ public class KnowledgeBuilder extends AbstractBuilder {
         return new KnowledgeBase(rete, null, retriveNoLhsRules(rules));
     }
 
+    /**
+     * 根据规则集和资源库构造知识库
+     * @param ruleSet
+     * @param actionConfigs
+     * @param variables
+     * @return
+     */
+    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<ActionConfig> actionConfigs, List<Variable> variables) {
+        List<Rule> rules = new ArrayList<Rule>();
+        if (ruleSet.getRules() != null) {
+            rules.addAll(ruleSet.getRules());
+        }
+        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs, variables);
+        Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
+        return new KnowledgeBase(rete, null, retriveNoLhsRules(rules));
+    }
+
     private List<Rule> retriveNoLhsRules(List<Rule> rules) {
         List<Rule> noLhsRules = new ArrayList<Rule>();
         for (Rule rule : rules) {
@@ -223,7 +245,53 @@ public class KnowledgeBuilder extends AbstractBuilder {
      * @Author wpx
      * @Date 2020/12/22 14:19
      */
-    public KnowledgeBase buildKnowledgeBase(String xml, ResourceLibrary resourceLibrary) throws IOException {
+    public KnowledgeBase buildKnowledgeBase(String xml) throws IOException {
+
+        /**
+         * 2. 解析规则
+         */
+        //依赖常量库
+        List<ConstantLibrary> constantLibraries = new ArrayList<>();
+        //依赖的springbean
+        List<ActionLibrary> actionLibraries = new ArrayList<>();
+        ActionLibrary actionLibrary = new ActionLibrary();
+        actionLibraries.add(actionLibrary);
+        //依赖的变量
+        List<VariableLibrary> variableLibraries = new ArrayList<>();
+        VariableLibrary variableLibrary = new VariableLibrary();
+
+        //依赖的变量->变量类型
+        List<VariableCategory> variableCategories = new ArrayList<>();
+        VariableCategory variableCategory = new VariableCategory();
+        variableCategory.setClazz("java.util.HashMap");
+        variableCategory.setName("参数");
+        variableCategory.setType(CategoryType.Clazz);
+
+        //依赖的变量->变量信息
+        List<Variable> variables = new ArrayList<>();
+        Variable variable = new Variable();
+        variable.setAct(Act.InOut);
+        variable.setName("商品名称");
+        variable.setLabel("skuName");
+        variable.setType(Datatype.String);
+        variables.add(variable);
+
+        Variable variable2 = new Variable();
+        variable2.setAct(Act.InOut);
+        variable2.setName("商品id");
+        variable2.setLabel("skuId");
+        variable2.setType(Datatype.Long);
+        variables.add(variable2);
+
+        variableCategory.setVariables(variables);
+        variableCategories.add(variableCategory);
+        variableLibrary.setVariableCategories(variableCategories);
+        variableLibraries.add(variableLibrary);
+        ResourceLibrary resourceLibrary = new ResourceLibrary( variableLibraries, actionLibraries, constantLibraries);
+
+
+
+
         KnowledgePackageService knowledgePackageService = (KnowledgePackageService) applicationContext.getBean(KnowledgePackageService.BEAN_ID);
         List<Rule> rules = new ArrayList<Rule>();
        // Map<String, Library> libMap = new HashMap<String, Library>();

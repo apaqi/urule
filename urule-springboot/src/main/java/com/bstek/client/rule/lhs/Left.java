@@ -13,18 +13,42 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.bstek.urule.model.rule;
+package com.bstek.client.rule.lhs;
+
+import com.bstek.urule.model.rule.SimpleArithmetic;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月29日
  */
-public abstract class AbstractValue implements Value {
-	protected ComplexArithmetic arithmetic;
-	public ComplexArithmetic getArithmetic() {
-		return arithmetic;
-	}
+public class Left {
+    private LeftPart leftPart;
+    private LeftType type;
+    private SimpleArithmetic arithmetic;
 
-	public void setArithmetic(ComplexArithmetic arithmetic) {
-		this.arithmetic = arithmetic;
-	}
+
+    public LeftPart getLeftPart() {
+        return leftPart;
+    }
+
+    public void setLeftPart(LeftPart leftPart) {
+        this.leftPart = leftPart;
+    }
+
+    public SimpleArithmetic getArithmetic() {
+        return arithmetic;
+    }
+
+    public void setArithmetic(SimpleArithmetic arithmetic) {
+        this.arithmetic = arithmetic;
+    }
+
+    public LeftType getType() {
+        return type;
+    }
+
+    public void setType(LeftType type) {
+        this.type = type;
+    }
+
 }

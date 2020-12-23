@@ -13,18 +13,51 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.bstek.urule.model.rule;
+package com.bstek.client.rule.lhs;
+
+
+import com.bstek.client.rule.Op;
+import com.bstek.client.rule.Value;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月29日
  */
-public abstract class AbstractValue implements Value {
-	protected ComplexArithmetic arithmetic;
-	public ComplexArithmetic getArithmetic() {
-		return arithmetic;
-	}
+public class Criteria extends BaseCriterion {
+    private String id;
+    private Op op;
+    private Left left;
+    private Value value;
 
-	public void setArithmetic(ComplexArithmetic arithmetic) {
-		this.arithmetic = arithmetic;
-	}
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Op getOp() {
+        return op;
+    }
+
+    public void setOp(Op op) {
+        this.op = op;
+    }
+
+    public Left getLeft() {
+        return left;
+    }
+
+    public void setLeft(Left left) {
+        this.left = left;
+    }
+
+    public Value getValue() {
+        return value;
+    }
+
+    public void setValue(Value value) {
+        this.value = value;
+    }
 }

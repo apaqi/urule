@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.bstek.urule.Utils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -68,6 +69,62 @@ public class BuiltInActionLibraryBuilder implements ApplicationContextAware{
 			bean.setMethods(buildMethod(obj.getClass().getMethods()));
 			builtInActions.add(bean);
 		}
+	}
+
+	/**
+	 * @Description  新增注册spring bean 方法
+	 *
+	 * @Author wpx
+	 * @Date 2020/12/23 14:31
+	 * @param name
+	 * @return java.util.List<com.bstek.urule.model.library.action.SpringBean>
+	 */
+	public List<SpringBean> addActionBean(String name) throws BeansException {
+		ApplicationContext context= Utils.getApplicationContext();
+		Object obj = null;
+		try{
+			obj= context.getBean(name);
+		}catch(Exception ex){
+			return builtInActions;
+		}
+		if(obj==null){
+			return builtInActions;
+		}
+		SpringBean bean=new SpringBean();
+		bean.setId(name);
+		bean.setName(name);
+		bean.setMethods(buildConsumerMethod(obj.getClass().getMethods()));
+		builtInActions.add(bean);
+		return builtInActions;
+	}
+
+	/**
+	 * @Description  构造用户自定义bean方法
+	 *
+	 * @Author wpx
+	 * @Date 2020/12/23 14:30
+	 * @param methods
+	 * @return java.util.List<com.bstek.urule.model.library.action.Method>
+	 */
+	private List<com.bstek.urule.model.library.action.Method> buildConsumerMethod(Method[] methods){
+		List<com.bstek.urule.model.library.action.Method> list=new ArrayList<com.bstek.urule.model.library.action.Method>();
+		for(Method m:methods){
+			String name=m.getName();
+			String methodName=m.getName();
+			com.bstek.urule.model.library.action.Method libMethod=new com.bstek.urule.model.library.action.Method();
+			libMethod.setMethodName(methodName);
+			libMethod.setName(name);
+			list.add(libMethod);
+			java.lang.reflect.Parameter[] parameters = m.getParameters();
+			List<String> parameterNames=new ArrayList<String>();
+			if(parameters!=null){
+				for(int i=0,len=parameters.length;i<len;i++ ){
+					parameterNames.add(parameters[i].getName());
+				}
+			}
+			libMethod.setParameters(buildParameters(m,parameterNames));
+		}
+		return list;
 	}
 	private List<com.bstek.urule.model.library.action.Method> buildMethod(Method[] methods){
 		List<com.bstek.urule.model.library.action.Method> list=new ArrayList<com.bstek.urule.model.library.action.Method>();

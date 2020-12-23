@@ -13,18 +13,22 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  ******************************************************************************/
-package com.bstek.urule.model.rule;
+package com.bstek.client.rule;
+
+
 /**
  * @author Jacky.gao
- * @since 2014年12月29日
+ * @since 2014年12月25日
  */
-public abstract class AbstractValue implements Value {
-	protected ComplexArithmetic arithmetic;
-	public ComplexArithmetic getArithmetic() {
-		return arithmetic;
-	}
+public abstract class Arithmetic {
+    protected ArithmeticType type;
 
-	public void setArithmetic(ComplexArithmetic arithmetic) {
-		this.arithmetic = arithmetic;
-	}
+    public ArithmeticType getType() {
+        return type;
+    }
+
+    public void setType(ArithmeticType type) {
+        this.type = type;
+    }
+
 }
