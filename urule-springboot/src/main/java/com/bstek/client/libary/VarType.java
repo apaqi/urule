@@ -21,5 +21,5 @@ package com.bstek.client.libary;
  * @Date 2020/12/23 15:03
  */
 public enum VarType {
-	Variable,Constant,Parameter;
+	Variable,Parameter;
 }

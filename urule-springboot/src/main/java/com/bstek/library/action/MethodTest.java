@@ -3,19 +3,18 @@ package com.bstek.library.action;
 import com.bstek.library.vars.Customer;
 import com.bstek.urule.action.ActionId;
 import com.bstek.urule.model.ExposeAction;
-import com.bstek.urule.model.library.action.annotation.ActionBean;
-import com.bstek.urule.model.library.action.annotation.ActionMethod;
-import com.bstek.urule.model.library.action.annotation.ActionMethodParameter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 public class MethodTest {
-    @ActionId("Hello")
+    //@ActionId("Hello")
     public String hello(){
+        System.out.println("aa#####################################aa");
         return "hello";
     }
-    @ExposeAction(value="方法1",parameters={"用户名"})
+    //@ExposeAction(value="方法1",parameters={"用户名"})
     public boolean evalTest(String username){
+        System.out.println("aa#####################################aa");
         if(username==null){
             return false;
         }else if(username.equals("张三")){
@@ -24,7 +23,7 @@ public class MethodTest {
         return false;
     }
 
-    @ExposeAction(value="测试Int",parameters={"数字1","数字2"})
+    //@ExposeAction(value="测试Int",parameters={"数字1","数字2"})
     public int testInt(int a,int b){
         return a+b;
     }
@@ -32,7 +31,7 @@ public class MethodTest {
         return a+b*10;
     }
 
-    @ExposeAction(value="打印内容",parameters={"用户名","出生日期"})
+    //@ExposeAction(value="打印内容",parameters={"用户名","出生日期"})
     public void printContent(String username, Date birthday){
         SimpleDateFormat sd=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         if(birthday!=null){
@@ -42,7 +41,7 @@ public class MethodTest {
         }
     }
 
-    @ExposeAction(value="打印Customer",parameters={"Customer对象"})
+    //@ExposeAction(value="打印Customer",parameters={"Customer对象"})
     public void printUser(Customer m){
         System.out.println("Hello "+m.getName()+", has house:"+m.isHouse());
     }

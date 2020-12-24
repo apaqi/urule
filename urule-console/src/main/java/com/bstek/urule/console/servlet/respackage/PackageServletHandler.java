@@ -342,18 +342,13 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		RuleSet ruleSet = new RuleSet();
 		ruleSet.setRemark("RuleRegister");
 		ruleSet.setRules(Arrays.asList(this.buildRule()));
-		List<ActionConfig> actionConfigs = new ArrayList<>();
-		ActionConfig actionConfig = new ActionConfig();
-		actionConfig.setActionFlag("methodTest");
-		actionConfigs.add(actionConfig);
-
 		List<Variable> variables = new ArrayList<>();
 		Variable variable = new Variable();
 		variable.setType(Datatype.String);
 		variable.setLabel("username");
 		variable.setName("username");
 		variables.add(variable);
-		KnowledgeBase knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, actionConfigs, variables);
+		KnowledgeBase knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variables);
 		/**
 		 * 3. 缓存
 		 */
@@ -372,7 +367,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		Rule rule = new Rule();
 		rule.setName("test001");
 		rule.setRemark("test001");
-		rule.setLhs(buildLhs());
+		rule.setLhs(this.buildLhs());
 		Other other = new Other();
 		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
 		rule.setOther(other);
@@ -648,10 +643,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		long start=System.currentTimeMillis();
 		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
-			knowledgeBase=buildKnowledgeBase(req);
+			//knowledgeBase=buildKnowledgeBase(req);
 			//todo 通过xml知识库测试代码
 			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
-			//knowledgeBase = buildKnowledgeBaseByRuleSet(req);
+			knowledgeBase = buildKnowledgeBaseByRuleSet(req);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);

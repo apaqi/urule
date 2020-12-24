@@ -87,7 +87,7 @@ public class ActivationImpl implements Activation{
 		}else if(rule instanceof ScoreRule){
 			ScoreRule scoreRule=(ScoreRule)rule;
 			scoreRule.execute(context, objectCriteriaMap.keySet(), matchedObjects,variableMap);
-		}else{	
+		}else{
 			Rhs rhs=rule.getRhs();
 			if(rhs!=null){
 				List<Action> actions=rhs.getActions();

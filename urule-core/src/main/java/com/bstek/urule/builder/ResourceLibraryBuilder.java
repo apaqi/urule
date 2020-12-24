@@ -15,10 +15,7 @@
  ******************************************************************************/
 package com.bstek.urule.builder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.library.action.ActionConfig;
@@ -99,9 +96,6 @@ public class ResourceLibraryBuilder extends AbstractBuilder {
             variableCategoryLibs.add(parameterLib);
         }
         List<SpringBean> builtInActions = builtInActionLibraryBuilder.getBuiltInActions();
-        //todo todo todo todo
-        //此处加载规则以来的bean
-        builtInActions = builtInActionLibraryBuilder.addActionBean("methodTest");
         if (builtInActions.size() > 0) {
             ActionLibrary al = new ActionLibrary();
             al.setSpringBeans(builtInActions);
@@ -113,11 +107,13 @@ public class ResourceLibraryBuilder extends AbstractBuilder {
     @SuppressWarnings("unchecked")
     public ResourceLibrary buildResourceLibrary(List<ActionConfig> actionConfigs, List<Variable> variables) {
         List<SpringBean> builtInActions = builtInActionLibraryBuilder.getBuiltInActions();
-        if(!CollectionUtils.isEmpty(actionConfigs)) {
-            for (ActionConfig actionConfig : actionConfigs) {
-                builtInActions = builtInActionLibraryBuilder.addActionBean(actionConfig.getActionFlag());
-            }
+        List<ActionLibrary> actionLibraryLibs = new ArrayList<ActionLibrary>();
+        if (builtInActions.size() > 0) {
+            ActionLibrary al = new ActionLibrary();
+            al.setSpringBeans(builtInActions);
+            actionLibraryLibs.add(al);
         }
+        this.addCustomActionLibs(actionConfigs, actionLibraryLibs);
 
         List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
         if(!CollectionUtils.isEmpty(variables)) {
@@ -136,13 +132,33 @@ public class ResourceLibraryBuilder extends AbstractBuilder {
             variableCategoryLibs.add(variableLibrary);
         }
 
-        List<ActionLibrary> actionLibraryLibs = new ArrayList<ActionLibrary>();
-        if (builtInActions.size() > 0) {
-            ActionLibrary al = new ActionLibrary();
-            al.setSpringBeans(builtInActions);
-            actionLibraryLibs.add(al);
-        }
         return new ResourceLibrary(variableCategoryLibs, actionLibraryLibs, new ArrayList<ConstantLibrary>());
+    }
+
+    /**
+     * @Description  添加用户自定义行为库（规则中用到的bean）
+     *
+     * @Author wpx
+     * @Date 2020/12/24 18:29
+     * @param actionConfigs
+     * @param actionLibraryLibs
+     * @return void
+     */
+    private void addCustomActionLibs(List<ActionConfig> actionConfigs, List<ActionLibrary> actionLibraryLibs) {
+        Set csb = new HashSet();
+        List<SpringBean> costomerSpringBeans = new ArrayList<>();
+        if(!CollectionUtils.isEmpty(actionConfigs)) {
+            for (ActionConfig actionConfig : actionConfigs) {
+                if(!csb.contains(actionConfig.getActionFlag())) {
+                    costomerSpringBeans = builtInActionLibraryBuilder.addActionBean(actionConfig.getActionFlag());
+                }
+            }
+        }
+        if (costomerSpringBeans.size() > 0) {
+            ActionLibrary b1 = new ActionLibrary();
+            b1.setSpringBeans(costomerSpringBeans);
+            actionLibraryLibs.add(b1);
+        }
     }
 
     public void setBuiltInActionLibraryBuilder(

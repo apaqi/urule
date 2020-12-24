@@ -16,16 +16,14 @@
 package com.bstek.urule.builder;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.action.ActionLibrary;
 import com.bstek.urule.model.library.constant.ConstantLibrary;
 import com.bstek.urule.model.library.variable.*;
+import com.bstek.urule.model.rule.lhs.*;
 import org.dom4j.Element;
 
 import com.bstek.urule.builder.resource.Resource;
@@ -42,13 +40,13 @@ import com.bstek.urule.model.rete.builder.ReteBuilder;
 import com.bstek.urule.model.rule.Library;
 import com.bstek.urule.model.rule.Rule;
 import com.bstek.urule.model.rule.RuleSet;
-import com.bstek.urule.model.rule.lhs.Lhs;
 import com.bstek.urule.model.rule.loop.LoopRule;
 import com.bstek.urule.model.scorecard.runtime.ScoreRule;
 import com.bstek.urule.model.table.DecisionTable;
 import com.bstek.urule.model.table.ScriptDecisionTable;
 import com.bstek.urule.runtime.KnowledgePackageWrapper;
 import com.bstek.urule.runtime.service.KnowledgePackageService;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Jacky.gao
@@ -200,18 +198,62 @@ public class KnowledgeBuilder extends AbstractBuilder {
     /**
      * 根据规则集和资源库构造知识库
      * @param ruleSet
-     * @param actionConfigs
      * @param variables
      * @return
      */
-    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<ActionConfig> actionConfigs, List<Variable> variables) {
+    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet,  List<Variable> variables) {
         List<Rule> rules = new ArrayList<Rule>();
         if (ruleSet.getRules() != null) {
             rules.addAll(ruleSet.getRules());
         }
-        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs, variables);
+        List<ActionConfig> actionConfigs2 = this.buildActionConfigs(ruleSet);
+        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs2, variables);
         Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
         return new KnowledgeBase(rete, null, retriveNoLhsRules(rules));
+    }
+
+    /**
+     * 构造客户端端行为配置信息
+     * @param ruleSet
+     * @return
+     */
+    private List<ActionConfig> buildActionConfigs(RuleSet ruleSet) {
+        List<ActionConfig> actionConfigs = new ArrayList<>();
+        List<Rule> rules = ruleSet.getRules();
+        for(Rule rule : rules) {
+            Lhs lhs = rule.getLhs();
+            Criterion criterion = lhs.getCriterion();
+            if(criterion instanceof And) {
+                List<Criterion> criterions = ((And) criterion).getCriterions();
+                if(!CollectionUtils.isEmpty(criterions)) {
+                    for(Criterion andCriterion : criterions) {
+                        Criteria c = (Criteria)andCriterion;
+                        if(Objects.nonNull(c.getLeft()) && Objects.nonNull(c.getLeft().getLeftPart())
+                                && c.getLeft().getLeftPart() instanceof MethodLeftPart) {
+                            String beanId = ((MethodLeftPart) c.getLeft().getLeftPart()).getBeanId();
+                            ActionConfig actionConfig = new ActionConfig();
+                            actionConfig.setActionFlag(beanId);
+                            actionConfigs.add(actionConfig);
+                        }
+                    }
+                }
+            } else if(criterion instanceof Or){
+                List<Criterion> criterions = ((Or)criterion).getCriterions();
+                if(!CollectionUtils.isEmpty(criterions)) {
+                    for(Criterion orCriterion : criterions) {
+                        Criteria c = (Criteria)orCriterion;
+                        if(Objects.nonNull(c.getLeft()) && Objects.nonNull(c.getLeft().getLeftPart())
+                                && c.getLeft().getLeftPart() instanceof MethodLeftPart ) {
+                            String beanId = ((MethodLeftPart) c.getLeft().getLeftPart()).getBeanId();
+                            ActionConfig actionConfig = new ActionConfig();
+                            actionConfig.setActionFlag(beanId);
+                            actionConfigs.add(actionConfig);
+                        }
+                    }
+                }
+            }
+        }
+        return actionConfigs;
     }
 
     private List<Rule> retriveNoLhsRules(List<Rule> rules) {
