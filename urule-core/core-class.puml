@@ -66,9 +66,19 @@ class ActivationRuleBox{
 class AgendaGroupRuleBox{
 
 }
-'''todo '''
-interface KnowledgeEvent{
-    KnowledgeSession getKnowledgeSession();
+''' todo '''
+'''interface KnowledgeEvent{
+'''    KnowledgeSession getKnowledgeSession();
+'''}
+
+class ActivationImpl{
+}
+
+interface Action{
+
+}
+
+class ExecuteMethodAction{
 }
 
 KnowledgeSessionFactory --> KnowledgeSession
@@ -82,4 +92,16 @@ AbstractRuleBox --|> RuleBox
 ActivationGroupRuleBox --> AbstractRuleBox
 ActivationRuleBox --> AbstractRuleBox
 AgendaGroupRuleBox --> AbstractRuleBox
+
+ActivationRuleBox->ActivationImpl :execute
+
+
+ActivationImpl->Action :execute
+'''action 实现类'''
+ExecuteMethodAction --|> Action
+VariableAssignAction --|> Action
+ScoringAction --|> Action
+SimpleAction --|> Action
+
+
 @enduml
