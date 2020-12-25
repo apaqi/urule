@@ -1,7 +1,6 @@
 package com.bstek.client.rule.lhs;
 
 
-import com.bstek.client.libary.ActionConfig;
 import com.bstek.client.libary.VarConfig;
 
 import java.util.ArrayList;
@@ -19,10 +18,6 @@ public class RuleSet {
      * 规则集唯一标识
      */
     private String uuid;
-    /**
-     * 行为配置信息
-     */
-    private List<ActionConfig> actionConfigs;
     /**
      * 变量配置信息
      */
@@ -63,18 +58,4 @@ public class RuleSet {
         this.rules = rules;
     }
 
-    public void setActionConfigs(List<ActionConfig> actionConfigs) {
-        this.actionConfigs = actionConfigs;
-    }
-
-    public List<ActionConfig> getActionConfigs() {
-        return actionConfigs;
-    }
-
-    public void addActionConfigs(ActionConfig actionConfig) {
-        if (this.actionConfigs == null) {
-            this.actionConfigs = new ArrayList<ActionConfig>();
-        }
-        this.actionConfigs.add(actionConfig);
-    }
 }
