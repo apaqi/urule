@@ -1,0 +1,47 @@
+# Created by .ignore support plugin (hsz.mobi)
+### system ignore ###
+.DS_Store
+Thumbs.db
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+.factorypath
+output/
+
+### maven ignore ###
+target/
+out/
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+.mvn/
+mvnw
+mvnw.cmd
+
+### eclipse ignore ###
+.settings/
+.project
+.classpath
+
+### temp ignore ###
+logs/
+*.doc
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+test-output/
+
+# vue
+node_modules/
+/dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+log
