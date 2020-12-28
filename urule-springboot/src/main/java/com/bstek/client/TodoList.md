@@ -5,5 +5,7 @@
 ##或计算问题
 >1. 或计算异常问题
 >2. 或计算依赖资源（jsf接口等）排序问题，采用优先级控制。
-## 接口用build模式
->https://blog.csdn.net/qq_42183409/article/details/89473893
+## 客户端改造
+>1. 客户端采用build模式
+##ruleset解析优化
+>1. ruleset 加对象缓存及R2M缓存，在发布的时候进行ruleset构建
