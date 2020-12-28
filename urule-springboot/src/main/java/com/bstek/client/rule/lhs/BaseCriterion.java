@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.bstek.client.rule.lhs;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * @Description
  *
@@ -22,5 +24,14 @@ package com.bstek.client.rule.lhs;
  * @Date 2020/12/23 15:21
  */
 public abstract class BaseCriterion implements Criterion {
+    private Junction parent;
 
+    @Override
+    public Junction getParent() {
+        return parent;
+    }
+    @Override
+    public void setParent(Junction parent) {
+        this.parent = parent;
+    }
 }

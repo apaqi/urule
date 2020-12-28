@@ -29,35 +29,53 @@ public class Criteria extends BaseCriterion {
     private Left left;
     private Value value;
 
+    public static Criteria instance() {
+        return new Criteria();
+    }
+
+    public And and(){
+        And and = new And();
+        return and;
+    }
+
+    public Or or(){
+        Or or = new Or();
+        return or;
+    }
+
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public Criteria id(String id) {
         this.id = id;
+        return this;
     }
 
     public Op getOp() {
         return op;
     }
 
-    public void setOp(Op op) {
+    public Criteria op(Op op) {
         this.op = op;
+        return this;
     }
 
     public Left getLeft() {
         return left;
     }
 
-    public void setLeft(Left left) {
+    public Criteria left(Left left) {
         this.left = left;
+        return this;
     }
 
     public Value getValue() {
         return value;
     }
 
-    public void setValue(Value value) {
+    public Criteria value(Value value) {
         this.value = value;
+        return this;
     }
 }

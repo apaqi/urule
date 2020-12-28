@@ -35,6 +35,7 @@ public abstract class Junction extends BaseCriterion {
 		if(criterions==null){
 			criterions=new ArrayList<Criterion>();
 		}
+		criterion.setParent(this);
 		criterions.add(criterion);
 	}
 

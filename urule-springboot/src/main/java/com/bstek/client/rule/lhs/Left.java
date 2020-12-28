@@ -27,28 +27,35 @@ public class Left {
     private SimpleArithmetic arithmetic;
 
 
+    public static Left instance() {
+        return new Left();
+    }
+
     public LeftPart getLeftPart() {
         return leftPart;
     }
 
-    public void setLeftPart(LeftPart leftPart) {
+    public Left leftPart(LeftPart leftPart) {
         this.leftPart = leftPart;
+        return this;
     }
 
     public SimpleArithmetic getArithmetic() {
         return arithmetic;
     }
 
-    public void setArithmetic(SimpleArithmetic arithmetic) {
+    public Left arithmetic(SimpleArithmetic arithmetic) {
         this.arithmetic = arithmetic;
+        return this;
     }
 
     public LeftType getType() {
         return type;
     }
 
-    public void setType(LeftType type) {
+    public Left type(LeftType type) {
         this.type = type;
+        return this;
     }
 
 }

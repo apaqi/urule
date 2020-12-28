@@ -22,4 +22,6 @@ package com.bstek.client.rule.lhs;
  * @Date 2020/12/23 15:11
  */
 public interface Criterion {
+    Junction getParent();
+    void setParent(Junction parent);
 }

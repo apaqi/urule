@@ -24,4 +24,20 @@ public class And extends Junction {
 	public String getJunctionType() {
 		return JunctionType.and.name();
 	}
+
+	public And addCriterion(boolean isRoot, Criterion... criterions) {
+		if (null != criterions) {
+			for (int i = 0, len = criterions.length; i < len; i++) {
+				super.addCriterion(criterions[i]);
+			}
+		}
+		if(!isRoot) {
+			super.setParent(this);
+		}
+		return this;
+	}
+
+	public static And instance() {
+		return new And();
+	}
 }

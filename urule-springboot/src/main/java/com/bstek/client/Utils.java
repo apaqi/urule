@@ -34,13 +34,13 @@ public class Utils {
         Criteria criteria = new Criteria();
         Left left = new Left();
         MethodLeftPart leftPart = buildMethodLeftPart(beanId, methodId, parameters);
-        left.setLeftPart(leftPart);
-        left.setType(LeftType.method);
-        criteria.setLeft(left);
-        criteria.setOp(Op.Equals);
+        left.leftPart(leftPart);
+        left.type(LeftType.method);
+        criteria.left(left);
+        criteria.op(Op.Equals);
         SimpleValue simpleValue = new SimpleValue();
-        simpleValue.setContent(hopeVaule == null? "true" : hopeVaule.toString());
-        criteria.setValue(simpleValue);
+        simpleValue.content(hopeVaule == null? "true" : hopeVaule.toString());
+        criteria.value(simpleValue);
         return criteria;
     }
 
@@ -92,7 +92,7 @@ public class Utils {
         parameter.setName(parName);
         parameter.setType(type);
         SimpleValue simpleValue = new SimpleValue();
-        simpleValue.setContent(content);
+        simpleValue.content(content);
         parameter.setValue(simpleValue);
         return parameter;
     }
@@ -130,7 +130,7 @@ public class Utils {
         variableAssignAction.setType(LeftType.parameter);
         variableAssignAction.setVariableName(flag);
         SimpleValue value = new SimpleValue();
-        value.setContent(content);
+        value.content(content);
         variableAssignAction.setValue(value);
         return variableAssignAction;
     }

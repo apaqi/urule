@@ -643,10 +643,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		long start=System.currentTimeMillis();
 		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
-			//knowledgeBase=buildKnowledgeBase(req);
+			knowledgeBase=buildKnowledgeBase(req);
 			//todo 通过xml知识库测试代码
 			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
-			knowledgeBase = buildKnowledgeBaseByRuleSet(req);
+			//knowledgeBase = buildKnowledgeBaseByRuleSet(req);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);

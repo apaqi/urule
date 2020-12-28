@@ -31,8 +31,12 @@ public class SimpleValue extends AbstractValue {
 	public String getContent() {
 		return content;
 	}
-	public void setContent(String content) {
+	public SimpleValue content(String content) {
 		this.content = content;
+		return this;
 	}
 
+	public static SimpleValue instance(){
+		return new SimpleValue();
+	}
 }
