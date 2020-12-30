@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017 Bstek
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -14,27 +14,44 @@
  * the License.
  ******************************************************************************/
 package com.bstek.urule.model.rule;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月29日
  */
-public class SimpleValue  extends AbstractValue{
-	private String content;
-	private ValueType valueType=ValueType.Input;
-	public ValueType getValueType() {
-		return valueType;
-	}
-	public String getContent() {
-		return content;
-	}
-	public void setContent(String content) {
-		this.content = content;
-	}
-	public String getId() {
-		String id="[字符]"+content;
-		if(arithmetic!=null){
-			id+=arithmetic.getId();
-		}
-		return id;
-	}
+public class SimpleValue extends AbstractValue {
+    private String content;
+    private ValueType valueType = ValueType.Input;
+
+    @Override
+    public ValueType getValueType() {
+        return valueType;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public SimpleValue setContent(String content) {
+        this.content = content;
+        return this;
+    }
+	@Override
+    public String getId() {
+        String id = "[字符]" + content;
+        if (arithmetic != null) {
+            id += arithmetic.getId();
+        }
+        return id;
+    }
+
+    public static SimpleValue instance() {
+        return new SimpleValue();
+    }
+
+    public static SimpleValue instance(String content) {
+        SimpleValue simpleValue = new SimpleValue();
+        simpleValue.setContent(content);
+        return simpleValue;
+    }
 }

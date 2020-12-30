@@ -24,6 +24,7 @@ import com.bstek.urule.model.library.action.ActionLibrary;
 import com.bstek.urule.model.library.constant.ConstantLibrary;
 import com.bstek.urule.model.library.variable.*;
 import com.bstek.urule.model.rule.lhs.*;
+import com.google.common.collect.Sets;
 import org.dom4j.Element;
 
 import com.bstek.urule.builder.resource.Resource;
@@ -219,39 +220,12 @@ public class KnowledgeBuilder extends AbstractBuilder {
      */
     private List<ActionConfig> buildActionConfigs(RuleSet ruleSet) {
         List<ActionConfig> actionConfigs = new ArrayList<>();
+        Set<String> methodSet = Sets.newHashSet();
         List<Rule> rules = ruleSet.getRules();
         for(Rule rule : rules) {
             Lhs lhs = rule.getLhs();
             Criterion criterion = lhs.getCriterion();
-            if(criterion instanceof And) {
-                List<Criterion> criterions = ((And) criterion).getCriterions();
-                if(!CollectionUtils.isEmpty(criterions)) {
-                    for(Criterion andCriterion : criterions) {
-                        Criteria c = (Criteria)andCriterion;
-                        if(Objects.nonNull(c.getLeft()) && Objects.nonNull(c.getLeft().getLeftPart())
-                                && c.getLeft().getLeftPart() instanceof MethodLeftPart) {
-                            String beanId = ((MethodLeftPart) c.getLeft().getLeftPart()).getBeanId();
-                            ActionConfig actionConfig = new ActionConfig();
-                            actionConfig.setActionFlag(beanId);
-                            actionConfigs.add(actionConfig);
-                        }
-                    }
-                }
-            } else if(criterion instanceof Or){
-                List<Criterion> criterions = ((Or)criterion).getCriterions();
-                if(!CollectionUtils.isEmpty(criterions)) {
-                    for(Criterion orCriterion : criterions) {
-                        Criteria c = (Criteria)orCriterion;
-                        if(Objects.nonNull(c.getLeft()) && Objects.nonNull(c.getLeft().getLeftPart())
-                                && c.getLeft().getLeftPart() instanceof MethodLeftPart ) {
-                            String beanId = ((MethodLeftPart) c.getLeft().getLeftPart()).getBeanId();
-                            ActionConfig actionConfig = new ActionConfig();
-                            actionConfig.setActionFlag(beanId);
-                            actionConfigs.add(actionConfig);
-                        }
-                    }
-                }
-            }
+            parseMethod(criterion, actionConfigs, methodSet);
         }
         return actionConfigs;
     }
@@ -425,5 +399,60 @@ public class KnowledgeBuilder extends AbstractBuilder {
 
     public void setDecisionTreeRulesBuilder(DecisionTreeRulesBuilder decisionTreeRulesBuilder) {
         this.decisionTreeRulesBuilder = decisionTreeRulesBuilder;
+    }
+
+    private void parseMethod(Criterion criterion, List<ActionConfig> actionConfigs, Set<String> methodSet){
+        if(criterion instanceof And) {
+            List<Criterion> criterions = ((And) criterion).getCriterions();
+            if(!CollectionUtils.isEmpty(criterions)) {
+                for(Criterion andCriterion : criterions) {
+                    if(andCriterion instanceof And) {
+                        parseMethod(andCriterion, actionConfigs, methodSet);
+                    } else if(andCriterion instanceof Or){
+                        parseMethod(andCriterion, actionConfigs, methodSet);
+                    }else {
+                        Criteria c = (Criteria)andCriterion;
+                        if(Objects.nonNull(c.getLeft()) && Objects.nonNull(c.getLeft().getLeftPart())
+                                && c.getLeft().getLeftPart() instanceof MethodLeftPart) {
+                            String beanId = ((MethodLeftPart) c.getLeft().getLeftPart()).getBeanId();
+                            if(!methodSet.contains(beanId)) {
+                                ActionConfig actionConfig = new ActionConfig();
+                                actionConfig.setActionFlag(beanId);
+                                actionConfigs.add(actionConfig);
+                                //methodSet.add(beanId);
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+        if(criterion instanceof Or ) {
+            List<Criterion> criterions = ((Or)criterion).getCriterions();
+            if(!CollectionUtils.isEmpty(criterions)) {
+                for(Criterion orCriterion : criterions) {
+                    if(orCriterion instanceof Or) {
+                        parseMethod(orCriterion, actionConfigs, methodSet);
+                    }else if(orCriterion instanceof And){
+                        parseMethod(orCriterion, actionConfigs, methodSet);
+                    }else {
+                        Criteria c = (Criteria)orCriterion;
+                        if(Objects.nonNull(c.getLeft()) && Objects.nonNull(c.getLeft().getLeftPart())
+                                && c.getLeft().getLeftPart() instanceof MethodLeftPart ) {
+                            String beanId = ((MethodLeftPart) c.getLeft().getLeftPart()).getBeanId();
+                            if(!methodSet.contains(beanId)) {
+                                ActionConfig actionConfig = new ActionConfig();
+                                actionConfig.setActionFlag(beanId);
+                                actionConfigs.add(actionConfig);
+                                //methodSet.add(beanId);
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
     }
 }

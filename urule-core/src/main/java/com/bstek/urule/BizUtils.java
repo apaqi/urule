@@ -23,12 +23,13 @@ public class BizUtils {
     /**
      * 构建方法信息
      *
-     * @param beanId
-     * @param methodId
-     * @param parameters
+     * @param beanId       接口beanId
+     * @param methodId     方法签名
+     * @param desiredValue 期望值
+     * @param parameters   参数列表
      * @return
      */
-    public static Criteria buildMethodLeftCriteria(String beanId, String methodId, Boolean hopeVaule, Parameter... parameters) {
+    public static Criteria buildMethodLeftCriteria(String beanId, String methodId, Boolean desiredValue, Parameter... parameters) {
         Criteria criteria = new Criteria();
         Left left = new Left();
         MethodLeftPart leftPart = buildMethodLeftPart(beanId, methodId, parameters);
@@ -37,7 +38,7 @@ public class BizUtils {
         criteria.setLeft(left);
         criteria.setOp(Op.Equals);
         SimpleValue simpleValue = new SimpleValue();
-        simpleValue.setContent(hopeVaule == null ? "true" : hopeVaule.toString());
+        simpleValue.setContent(desiredValue == null ? "true" : desiredValue.toString());
         criteria.setValue(simpleValue);
         return criteria;
     }
@@ -72,7 +73,9 @@ public class BizUtils {
     public static MethodLeftPart buildMethodLeftPart(String beanId, String methodId, Parameter... parameters) {
         MethodLeftPart leftPart = new MethodLeftPart();
         leftPart.setBeanId(beanId);
+        leftPart.setBeanLabel(beanId);
         leftPart.setMethodName(methodId);
+        leftPart.setMethodLabel(methodId);
         List<Parameter> parameterList = new ArrayList<>();
         for (int i = 0; i < parameters.length; i++) {
             parameterList.add(parameters[i]);

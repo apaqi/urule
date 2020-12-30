@@ -122,29 +122,40 @@ public class Criteria extends BaseCriterion implements BaseCriteria{
 	public String getId() {
 		if(id==null){
 			id=left.getId()+"【"+op.toString()+"】";
-			if(value!=null)id+=value.getId();
+			if(value!=null){
+				id+=value.getId();
+			}
 		}
 		return id;
 	}
-	public void setId(String id) {
+
+	public static Criteria instance() {
+		return new Criteria();
+	}
+
+	public Criteria setId(String id) {
 		this.id = id;
+		return this;
 	}
 	public Op getOp() {
 		return op;
 	}
-	public void setOp(Op op) {
+	public Criteria setOp(Op op) {
 		this.op = op;
+		return this;
 	}
 	public Left getLeft() {
 		return left;
 	}
-	public void setLeft(Left left) {
+	public Criteria setLeft(Left left) {
 		this.left = left;
+		return this;
 	}
 	public Value getValue() {
 		return value;
 	}
-	public void setValue(Value value) {
+	public Criteria setValue(Value value) {
 		this.value = value;
+		return this;
 	}
 }

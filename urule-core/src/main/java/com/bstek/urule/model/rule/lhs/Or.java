@@ -24,4 +24,27 @@ public class Or extends Junction {
 	public String getJunctionType() {
 		return JunctionType.or.name();
 	}
+
+	/**
+	 * 添加 OR 条件规则项
+	 * @param isRoot
+	 * @param criterions
+	 * @return
+	 */
+	public Or addCriterion(boolean isRoot, Criterion... criterions) {
+		if (null != criterions) {
+			for (int i = 0, len = criterions.length; i < len; i++) {
+				super.addCriterion(criterions[i]);
+			}
+		}
+		if(!isRoot) {
+			super.setParent(this);
+		}
+
+		return this;
+	}
+
+	public static Or instance() {
+		return new Or();
+	}
 }

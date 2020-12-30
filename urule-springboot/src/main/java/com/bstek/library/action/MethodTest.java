@@ -8,19 +8,24 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 public class MethodTest {
     //@ActionId("Hello")
-    public String hello(){
-        System.out.println("aa#####################################aa");
-        return "hello";
+    public String hello(String hello){
+        System.out.println("#####################################" + hello);
+        if("hello".equals(hello)) {
+            return "hello";
+        }else {
+            throw new RuntimeException("不是hello，异常了！");
+        }
     }
     //@ExposeAction(value="方法1",parameters={"用户名"})
     public boolean evalTest(String username){
-        System.out.println("aa#####################################aa");
+        System.out.println("#####################################" + username);
         if(username==null){
             return false;
         }else if(username.equals("张三")){
             return true;
+        }else {
+            throw new RuntimeException("不是张三，异常了！");
         }
-        return false;
     }
 
     //@ExposeAction(value="测试Int",parameters={"数字1","数字2"})

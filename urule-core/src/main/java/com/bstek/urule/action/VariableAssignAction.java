@@ -34,6 +34,8 @@ import com.bstek.urule.runtime.rete.ValueCompute;
 
 
 /**
+ * 变量赋值行为
+ *
  * @author Jacky.gao
  * @since 2014年12月22日
  */

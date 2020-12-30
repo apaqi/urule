@@ -44,4 +44,14 @@ public class Rhs {
 		actions.add(action);
 		Collections.sort(actions);
 	}
+
+	/**
+	 * 获取实例
+	 *
+	 * @return
+	 */
+	public static Rhs instance(){
+		return new Rhs();
+	}
+
 }

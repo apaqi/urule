@@ -99,4 +99,12 @@ public class CriteriaActivity  extends AbstractActivity {
 	public void reset() {
 		pass=false;
 	}
+
+	public boolean getPass() {
+		return pass;
+	}
+
+	public Criteria getCriteria() {
+		return criteria;
+	}
 }

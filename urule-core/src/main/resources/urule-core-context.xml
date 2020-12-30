@@ -380,5 +380,8 @@
 	<bean id="urule.decisionTreeResourceBuilder" class="com.bstek.urule.builder.resource.DecisionTreeResourceBuilder">
 		<property name="decisionTreeDeserializer" ref="urule.decisionTreeDeserializer"></property>
 	</bean>
-	
+
+	<bean id="knowledgeHelper" class="com.bstek.urule.knowledge.KnowledgeHelper">
+		<property name="knowledgeBuilder" ref="urule.knowledgeBuilder"></property>
+	</bean>
 </beans>

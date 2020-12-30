@@ -26,7 +26,12 @@ public class Lhs {
 		return criterion;
 	}
 
-	public void setCriterion(Criterion criterion) {
+	public Lhs setCriterion(Criterion criterion) {
 		this.criterion = criterion;
+		return this;
+	}
+
+	public static Lhs instance(){
+		return new Lhs();
 	}
 }

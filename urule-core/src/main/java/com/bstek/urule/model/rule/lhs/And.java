@@ -24,4 +24,26 @@ public class And extends Junction {
 	public String getJunctionType() {
 		return JunctionType.and.name();
 	}
+
+	public static And instance() {
+		return new And();
+	}
+
+	/**
+	 *
+	 * @param isRoot 是否是根节点 and 条件
+	 * @param criterions
+	 * @return
+	 */
+	public And addCriterion(boolean isRoot, Criterion... criterions) {
+		if (null != criterions) {
+			for (int i = 0, len = criterions.length; i < len; i++) {
+				super.addCriterion(criterions[i]);
+			}
+		}
+		if(!isRoot) {
+			super.setParent(this);
+		}
+		return this;
+	}
 }

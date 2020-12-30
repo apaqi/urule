@@ -57,6 +57,7 @@
 		<property name="repositoryService" ref="urule.repositoryService"></property>
 		<property name="knowledgeBuilder" ref="urule.knowledgeBuilder"></property>
 		<property name="httpSessionKnowledgeCache" ref="urule.httpSessionKnowledgeCache"></property>
+		<property name="knowledgeHelper" ref="knowledgeHelper"></property>
 	</bean>
 	
 	<bean id="urule.reteDiagramServletHandler" class="com.bstek.urule.console.servlet.diagram.ReteDiagramServletHandler">
@@ -106,5 +107,5 @@
 		<property name="repositoryBuilder" ref="urule.repositoryBuilder"></property>
 		<property name="permissionService" ref="urule.permissionService"></property>
 	</bean>
-	
+
 </beans>

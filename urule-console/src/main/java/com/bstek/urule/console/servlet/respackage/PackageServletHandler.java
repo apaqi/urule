@@ -27,11 +27,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.bstek.urule.BizUtils;
+import com.bstek.urule.knowledge.KnowledgeHelper;
 import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.variable.*;
 import com.bstek.urule.model.rule.*;
-import com.bstek.urule.model.rule.lhs.And;
-import com.bstek.urule.model.rule.lhs.Lhs;
+import com.bstek.urule.model.rule.lhs.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -85,6 +85,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	private RepositoryService repositoryService;
 	private KnowledgeBuilder knowledgeBuilder;
 	private HttpSessionKnowledgeCache httpSessionKnowledgeCache;
+
+	private KnowledgeHelper knowledgeHelper;
 	@Override
 	public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String method=retriveMethod(req);
@@ -616,11 +618,87 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			Utils.setObjectProperty(obj, var.getName(), value);
 		}
 	}
-	
-	
-	
+
+	/**
+	 * 新测试地址
+	 *
+	 * @param req
+	 * @param resp
+	 * @throws Exception
+	 */
 	@SuppressWarnings({ "unchecked"})
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+		Parameter leftPartParameter = BizUtils.buildSimpleParameter("username", Datatype.String, "王五");
+		/**规则组1*/
+		/**规则组1--规则1*/
+		MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "evalTest", leftPartParameter);
+		Criteria criteria1 = Criteria.instance()
+				.setLeft(Left.instance(leftPart))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+
+		/**规则组1--规则2*/
+		Parameter leftPart2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "李四二");
+		MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "evalTest", leftPart2Parameter);
+		Criteria criteria2 = Criteria.instance()
+				.setLeft(Left.instance(leftPart2))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+		Or and = Or.instance().addCriterion(false, criteria1, criteria2);
+		/**规则组2*/
+		/**规则组2 中的规则1*/
+		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "李四");
+		MethodLeftPart orCriteriaLeftPart1 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria1Parameter);
+		Criteria orCriteria1 = Criteria.instance()
+				.setLeft(Left.instance(orCriteriaLeftPart1))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("hello2"));
+		/**规则组2 中的规则2*/
+		Parameter orCriteria2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello");
+		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria2Parameter);
+		Criteria orCriteria2 = Criteria.instance()
+				.setLeft(Left.instance(orCriteriaLeftPart2))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("hello"));
+		Or or = Or.instance().addCriterion(false, orCriteria1, orCriteria2);
+		Lhs lhs = Lhs.instance().setCriterion(Or.instance().addCriterion(true, and, or));
+
+		Rhs rhs = Rhs.instance();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("username");
+		variable.setName("username");
+		variables.add(variable);
+
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.String);
+		variable2.setLabel("hello");
+		variable2.setName("hello");
+		variables.add(variable2);
+		//ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, variables);
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variables);
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
+
+	/**
+	 * 原始请求地址
+	 *
+	 * @param req
+	 * @param resp
+	 * @throws Exception
+	 */
+	@SuppressWarnings({ "unchecked"})
+	public void doTest_Back(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String data=req.getParameter("data");
 		ObjectMapper mapper=new ObjectMapper();
 		List<Map<String,Object>> list=mapper.readValue(data, ArrayList.class);
@@ -641,12 +719,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
-		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
+		KnowledgeBase knowledgeBase= (KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
-			knowledgeBase=buildKnowledgeBase(req);
-			//todo 通过xml知识库测试代码
+			knowledgeBase= buildKnowledgeBase(req);
 			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
-			//knowledgeBase = buildKnowledgeBaseByRuleSet(req);
 		}
 		KnowledgePackage knowledgePackage=knowledgeBase.getKnowledgePackage();
 		KnowledgeSession session=KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
@@ -836,7 +912,11 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			HttpSessionKnowledgeCache httpSessionKnowledgeCache) {
 		this.httpSessionKnowledgeCache = httpSessionKnowledgeCache;
 	}
-	
+
+	public void setKnowledgeHelper(KnowledgeHelper knowledgeHelper) {
+		this.knowledgeHelper = knowledgeHelper;
+	}
+
 	@Override
 	public String url() {
 		return "/packageeditor";
