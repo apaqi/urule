@@ -64,6 +64,34 @@
 	  <artifactId>guava</artifactId>
 	  <version>28.0-jre</version>
 	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.testng/testng -->
+	<dependency>
+	  <groupId>org.testng</groupId>
+	  <artifactId>testng</artifactId>
+	  <version>6.10</version>
+	  <scope>test</scope>
+	</dependency>
+
+	<dependency>
+	  <groupId>com.alibaba</groupId>
+	  <artifactId>fastjson</artifactId>
+	  <version>1.2.70</version>
+	  <scope>test</scope>
+	</dependency>
+
+	<dependency>
+	  <groupId>commons-collections</groupId>
+	  <artifactId>commons-collections</artifactId>
+	  <version>3.2.2</version>
+	  <scope>test</scope>
+	</dependency>
+
+	<dependency>
+	  <groupId>org.apache.commons</groupId>
+	  <artifactId>commons-lang3</artifactId>
+	  <version>3.8.1</version>
+	  <scope>test</scope>
+	</dependency>
 
   </dependencies>
   <parent>

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.bstek.urule.model.rule.lhs;
 
+import java.util.List;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月29日
@@ -41,6 +43,23 @@ public class Or extends Junction {
 			super.setParent(this);
 		}
 
+		return this;
+	}
+
+	/**
+	 *添加 OR 条件规则项
+	 *
+	 * @param isRoot 是否是根节点 OR 条件
+	 * @param criterions
+	 * @return
+	 */
+	public Or setCriterions(boolean isRoot, List<Criterion> criterions) {
+		if (null != criterions) {
+			super.setCriterions(criterions);
+		}
+		if(!isRoot) {
+			super.setParent(this);
+		}
 		return this;
 	}
 

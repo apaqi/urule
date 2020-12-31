@@ -15,6 +15,8 @@
  ******************************************************************************/
 package com.bstek.urule.model.rule.lhs;
 
+import java.util.List;
+
 /**
  * @author Jacky.gao
  * @since 2014年12月25日
@@ -40,6 +42,22 @@ public class And extends Junction {
 			for (int i = 0, len = criterions.length; i < len; i++) {
 				super.addCriterion(criterions[i]);
 			}
+		}
+		if(!isRoot) {
+			super.setParent(this);
+		}
+		return this;
+	}
+
+	/**
+	 *
+	 * @param isRoot 是否是根节点 and 条件
+	 * @param criterions
+	 * @return
+	 */
+	public And setCriterions(boolean isRoot, List<Criterion> criterions) {
+		if (null != criterions) {
+			super.setCriterions(criterions);
 		}
 		if(!isRoot) {
 			super.setParent(this);
