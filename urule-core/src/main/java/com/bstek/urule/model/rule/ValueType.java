@@ -19,5 +19,5 @@ package com.bstek.urule.model.rule;
  * @since 2014年12月25日
  */
 public enum ValueType {
-	Input,Variable,Constant,VariableCategory,Method,Parameter,Paren,CommonFunction,NamedReference;
+	Input,Variable,Constant,VariableCategory,Method,Parameter,Paren,CommonFunction,NamedReference,ComplexInput;
 }

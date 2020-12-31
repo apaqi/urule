@@ -105,7 +105,7 @@ public class ResourceLibraryBuilder extends AbstractBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    public ResourceLibrary buildResourceLibrary(List<ActionConfig> actionConfigs, List<Variable> variables) {
+    public ResourceLibrary buildResourceLibrary(List<ActionConfig> actionConfigs, List<VariableLibrary> variableCategoryLibs) {
         List<SpringBean> builtInActions = builtInActionLibraryBuilder.getBuiltInActions();
         List<ActionLibrary> actionLibraryLibs = new ArrayList<ActionLibrary>();
         if (builtInActions.size() > 0) {
@@ -115,22 +115,7 @@ public class ResourceLibraryBuilder extends AbstractBuilder {
         }
         this.addCustomActionLibs(actionConfigs, actionLibraryLibs);
 
-        List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
-        if(!CollectionUtils.isEmpty(variables)) {
-            //依赖的变量
-            VariableLibrary variableLibrary = new VariableLibrary();
-            //依赖的变量->变量类型，只支持map结构
-            List<VariableCategory> variableCategories = new ArrayList<>();
-            VariableCategory variableCategory = new VariableCategory();
-            variableCategory.setClazz("java.util.HashMap");
-            variableCategory.setName("参数");
-            variableCategory.setType(CategoryType.Clazz);
-            //依赖的变量->变量信息
-            variableCategory.setVariables(variables);
-            variableCategories.add(variableCategory);
-            variableLibrary.setVariableCategories(variableCategories);
-            variableCategoryLibs.add(variableLibrary);
-        }
+
 
         return new ResourceLibrary(variableCategoryLibs, actionLibraryLibs, new ArrayList<ConstantLibrary>());
     }

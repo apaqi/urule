@@ -10,6 +10,7 @@ import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.library.constant.ConstantCategory;
 import com.bstek.urule.model.library.variable.Variable;
 import com.bstek.urule.model.library.variable.VariableCategory;
+import com.bstek.urule.model.library.variable.VariableLibrary;
 import com.bstek.urule.model.rule.Other;
 import com.bstek.urule.model.rule.Rhs;
 import com.bstek.urule.model.rule.Rule;
@@ -46,20 +47,20 @@ public class KnowledgeHelper implements ApplicationContextAware {
     /**
      * @param ruleId
      * @param lhs
-     * @param variables
+     * @param variableCategoryLibs
      * @return com.bstek.urule.runtime.response.ExecutionResponse
      * @Description 执行规则
      * @Author wpx
      * @Date 2020/12/29 14:09
      */
-    public ExecutionResponse execute(String ruleId, Lhs lhs, List<Variable> variables) {
+    public ExecutionResponse execute(String ruleId, Lhs lhs, List<VariableLibrary> variableCategoryLibs) {
         Rhs rhs = Rhs.instance();
         rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
 
         Other other = new Other();
         other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
 
-        return execute(ruleId, lhs, other, rhs, variables);
+        return execute(ruleId, lhs, other, rhs, variableCategoryLibs);
     }
 
 
@@ -68,14 +69,14 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @param lhs
      * @param other
      * @param rhs
-     * @param variables
+     * @param variableCategoryLibs
      * @return com.bstek.urule.runtime.response.ExecutionResponse
      * @Description 执行规则
      * @Author wpx
      * @Date 2020/12/29 14:09
      */
-    public ExecutionResponse execute(String ruleId, Lhs lhs, Other other, Rhs rhs, List<Variable> variables) {
-        KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, variables);
+    public ExecutionResponse execute(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
+        KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, variableCategoryLibs);
         KnowledgePackage knowledgePackage = knowledgeBase.getKnowledgePackage();
         //构造树
         KnowledgeSession session = KnowledgeSessionFactory.newKnowledgeSession(knowledgePackage);
@@ -128,19 +129,19 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @param lhs
      * @param other
      * @param rhs
-     * @param variables
+     * @param variableCategoryLibs
      * @return com.bstek.urule.builder.KnowledgeBase
      * @Description 根据规则集构造知识包
      * @Author wpx
      * @Date 2020/12/29 13:44
      */
-    private KnowledgeBase buildKnowledgeBaseByRuleSet(String ruleId, Lhs lhs, Other other, Rhs rhs, List<Variable> variables) {
+    private KnowledgeBase buildKnowledgeBaseByRuleSet(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
         KnowledgeBase knowledgeBase = KNOWLEDGE_CACHE.getIfPresent(ruleId);
         if (null == knowledgeBase) {
             RuleSet ruleSet = new RuleSet();
             ruleSet.setRemark("RuleRegister");
             ruleSet.setRules(Arrays.asList(this.buildRule(lhs, other, rhs)));
-            knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variables);
+            knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variableCategoryLibs);
             KNOWLEDGE_CACHE.put(ruleId, knowledgeBase);
         }
         return knowledgeBase;

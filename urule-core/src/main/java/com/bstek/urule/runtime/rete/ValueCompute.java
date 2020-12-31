@@ -28,22 +28,7 @@ import com.bstek.urule.model.GeneralEntity;
 import com.bstek.urule.model.function.Argument;
 import com.bstek.urule.model.function.FunctionDescriptor;
 import com.bstek.urule.model.library.variable.VariableCategory;
-import com.bstek.urule.model.rule.AbstractValue;
-import com.bstek.urule.model.rule.ArithmeticType;
-import com.bstek.urule.model.rule.CommonFunctionValue;
-import com.bstek.urule.model.rule.ComplexArithmetic;
-import com.bstek.urule.model.rule.ConstantValue;
-import com.bstek.urule.model.rule.MethodValue;
-import com.bstek.urule.model.rule.NamedReferenceValue;
-import com.bstek.urule.model.rule.ParameterValue;
-import com.bstek.urule.model.rule.ParenValue;
-import com.bstek.urule.model.rule.SimpleArithmetic;
-import com.bstek.urule.model.rule.SimpleArithmeticValue;
-import com.bstek.urule.model.rule.SimpleValue;
-import com.bstek.urule.model.rule.Value;
-import com.bstek.urule.model.rule.ValueType;
-import com.bstek.urule.model.rule.VariableCategoryValue;
-import com.bstek.urule.model.rule.VariableValue;
+import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.CommonFunctionParameter;
 
 /**
@@ -181,6 +166,8 @@ public class ValueCompute {
 			}else{
 				left=obj;			
 			}
+		}else if(type.equals(ValueType.ComplexInput) ){
+			left=((ComplexObjectValue)value).getContent();
 		}else{
 			VariableValue vv=(VariableValue)value;
 			String categoryName=vv.getVariableCategory();

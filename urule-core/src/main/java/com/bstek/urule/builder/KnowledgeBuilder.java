@@ -199,16 +199,16 @@ public class KnowledgeBuilder extends AbstractBuilder {
     /**
      * 根据规则集和资源库构造知识库
      * @param ruleSet
-     * @param variables
+     * @param variableCategoryLibs
      * @return
      */
-    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet,  List<Variable> variables) {
+    public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<VariableLibrary> variableCategoryLibs) {
         List<Rule> rules = new ArrayList<Rule>();
         if (ruleSet.getRules() != null) {
             rules.addAll(ruleSet.getRules());
         }
         List<ActionConfig> actionConfigs2 = this.buildActionConfigs(ruleSet);
-        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs2, variables);
+        ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs2, variableCategoryLibs);
         Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
         return new KnowledgeBase(rete, null, retriveNoLhsRules(rules));
     }

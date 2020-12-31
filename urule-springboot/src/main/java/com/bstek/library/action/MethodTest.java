@@ -1,11 +1,17 @@
 package com.bstek.library.action;
 
 import com.bstek.library.vars.Customer;
+import com.bstek.library.vars.Dept;
 import com.bstek.urule.action.ActionId;
+import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.model.ExposeAction;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 public class MethodTest {
     //@ActionId("Hello")
     public String hello(String hello){
@@ -49,5 +55,17 @@ public class MethodTest {
     //@ExposeAction(value="打印Customer",parameters={"Customer对象"})
     public void printUser(Customer m){
         System.out.println("Hello "+m.getName()+", has house:"+m.isHouse());
+    }
+
+    public void printUsers(List<String> customers, Map<String, DefaultUser> maps){
+        if (CollectionUtils.isNotEmpty(customers)) {
+            customers.forEach(m->{
+                System.out.println("Hello "+m);
+            });
+        }
+        for(Map.Entry<String, DefaultUser> entry :  maps.entrySet()) {
+            System.out.println("key="+entry.getKey()+"###CompanyId="+entry.getValue().getCompanyId());
+        }
+
     }
 }

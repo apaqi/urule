@@ -4,10 +4,7 @@ import com.bstek.urule.action.Action;
 import com.bstek.urule.action.ExecuteMethodAction;
 import com.bstek.urule.action.VariableAssignAction;
 import com.bstek.urule.model.library.Datatype;
-import com.bstek.urule.model.rule.Op;
-import com.bstek.urule.model.rule.Parameter;
-import com.bstek.urule.model.rule.SimpleValue;
-import com.bstek.urule.model.rule.VariableValue;
+import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.*;
 
 import java.util.ArrayList;
@@ -135,6 +132,24 @@ public class BizUtils {
         variableValue.setDatatype(type);
         variableValue.setVariableCategory("参数");
         parameter.setValue(variableValue);
+        return parameter;
+    }
+
+    /**
+     * 构建变量参数
+     *
+     * @param parName
+     * @param type
+     * @param obj
+     * @return
+     */
+    public static Parameter buildComplexObjectValueParameter(String parName, Datatype type, Object obj) {
+        Parameter parameter = new Parameter();
+        parameter.setName(parName);
+        parameter.setType(type);
+        ComplexObjectValue complexObjectValue = new ComplexObjectValue();
+        complexObjectValue.setContent(obj);
+        parameter.setValue(complexObjectValue);
         return parameter;
     }
 

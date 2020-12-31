@@ -27,9 +27,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.bstek.urule.BizUtils;
+import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.knowledge.KnowledgeHelper;
 import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.variable.*;
+import com.bstek.urule.model.rete.JsonUtils;
 import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.*;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -37,6 +39,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang.StringUtils;
+import org.apache.jackrabbit.commons.json.JsonUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Row;
@@ -73,6 +76,7 @@ import com.bstek.urule.runtime.KnowledgeSessionFactory;
 import com.bstek.urule.runtime.cache.CacheUtils;
 import com.bstek.urule.runtime.response.ExecutionResponse;
 import com.bstek.urule.runtime.response.ExecutionResponseImpl;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Jacky.gao
@@ -329,28 +333,6 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	private KnowledgeBase buildKnowledgeBaseByRuleXml(HttpServletRequest req, String xml) throws IOException{
 
 		KnowledgeBase knowledgeBase=knowledgeBuilder.buildKnowledgeBase(xml);
-		/**
-		 * 3. 缓存
-		 */
-		httpSessionKnowledgeCache.remove(req, KB_KEY);
-		httpSessionKnowledgeCache.put(req, KB_KEY, knowledgeBase);
-		return knowledgeBase;
-	}
-
-	/**
-	 * 根据规则集构造知识包
-	 */
-	private KnowledgeBase buildKnowledgeBaseByRuleSet(HttpServletRequest req){
-		RuleSet ruleSet = new RuleSet();
-		ruleSet.setRemark("RuleRegister");
-		ruleSet.setRules(Arrays.asList(this.buildRule()));
-		List<Variable> variables = new ArrayList<>();
-		Variable variable = new Variable();
-		variable.setType(Datatype.String);
-		variable.setLabel("username");
-		variable.setName("username");
-		variables.add(variable);
-		KnowledgeBase knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variables);
 		/**
 		 * 3. 缓存
 		 */
@@ -654,8 +636,21 @@ public class PackageServletHandler extends RenderPageServletHandler {
 				.setOp(Op.Equals)
 				.setValue(SimpleValue.instance("hello2"));
 		/**规则组2 中的规则2*/
-		Parameter orCriteria2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello");
-		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria2Parameter);
+
+		List<String> customers = new ArrayList<String>(){{
+			add("123");
+			add("546");
+		}};
+		Map<String,DefaultUser> maps = new HashMap<String,DefaultUser>(){{
+			DefaultUser defaultUser = new DefaultUser();
+			defaultUser.setAdmin(true);
+			defaultUser.setCompanyId("33454");
+			put("001",defaultUser);
+		}};
+
+		Parameter orCriteria2Parameter = BizUtils.buildComplexObjectValueParameter("customers", Datatype.List,customers);
+		Parameter orCriteria3Parameter = BizUtils.buildComplexObjectValueParameter("maps", Datatype.Map,maps);
+		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "printUsers", orCriteria2Parameter,orCriteria3Parameter);
 		Criteria orCriteria2 = Criteria.instance()
 				.setLeft(Left.instance(orCriteriaLeftPart2))
 				.setOp(Op.Equals)
@@ -683,7 +678,45 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		variable2.setName("hello");
 		variables.add(variable2);
 		//ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, variables);
-		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variables);
+
+
+		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			VariableLibrary variableLibrary = new VariableLibrary();
+			//依赖的变量->变量类型，只支持map结构
+			List<VariableCategory> variableCategories = new ArrayList<>();
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("java.util.HashMap");
+			variableCategory.setName("参数");
+			variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+
+			//todo
+			VariableCategory variableCategory2 = new VariableCategory();
+			variableCategory2.setClazz("java.util.List");
+			variableCategory2.setName("参数");//list参数
+			variableCategory2.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			List<Variable> variables2 = new ArrayList<>();
+			Variable variable3 = new Variable();
+			variable3.setType(Datatype.List);
+			variable3.setLabel("customers");
+			variable3.setName("customers");
+			variables2.add(variable3);
+			variableCategory2.setVariables(variables2);
+			variableCategories.add(variableCategory2);
+
+			variableLibrary.setVariableCategories(variableCategories);
+			variableCategoryLibs.add(variableLibrary);
+		}
+
+
+
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategoryLibs);
 		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
 		List<RuleInfo> firedRules=res.getFiredRules();
 		List<RuleInfo> matchedRules=res.getMatchedRules();
@@ -698,7 +731,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 * @throws Exception
 	 */
 	@SuppressWarnings({ "unchecked"})
-	public void doTest_Back(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+	public void doTest_back(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		String data=req.getParameter("data");
 		ObjectMapper mapper=new ObjectMapper();
 		List<Map<String,Object>> list=mapper.readValue(data, ArrayList.class);
@@ -719,7 +752,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		}
 		String flowId=req.getParameter("flowId");
 		long start=System.currentTimeMillis();
-		KnowledgeBase knowledgeBase= (KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
+		KnowledgeBase knowledgeBase= null;//(KnowledgeBase)httpSessionKnowledgeCache.get(req, KB_KEY);
 		if(knowledgeBase==null){
 			knowledgeBase= buildKnowledgeBase(req);
 			//knowledgeBase = buildKnowledgeBaseByRuleXml(req, TEST_RULR_XML_V2);
