@@ -1,5 +1,6 @@
 >个人博客搭建 https://zhuanlan.zhihu.com/p/28321740
->
+#rete算法
+>https://blog.csdn.net/u012373815/article/details/53869097/
 >规则引擎技术 
 >>1. https://www.cnblogs.com/shangxiaofei/p/6429564.html
 >>2. https://www.cnblogs.com/shangxiaofei/p/6262107.html
