@@ -722,7 +722,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
 
 
-		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, variableCategoryLibs);
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
 		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
 		List<RuleInfo> firedRules=res.getFiredRules();
 		List<RuleInfo> matchedRules=res.getMatchedRules();

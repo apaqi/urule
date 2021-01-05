@@ -24,6 +24,7 @@ import com.bstek.urule.model.library.constant.ConstantCategory;
 import com.bstek.urule.model.library.constant.ConstantLibrary;
 import com.bstek.urule.model.library.variable.VariableCategory;
 import com.bstek.urule.model.library.variable.VariableLibrary;
+import org.springframework.util.CollectionUtils;
 
 /**
  * @author Jacky.gao
@@ -39,9 +40,11 @@ public class ResourceLibrary {
 		this.variableCategories=new ArrayList<VariableCategory>();
 		this.actionLibraries=new ArrayList<ActionLibrary>();
 		this.constantCategories=new ArrayList<ConstantCategory>();
-		for(VariableLibrary vl:variableLibraries){
-			for(VariableCategory category:vl.getVariableCategories()){
-				variableCategories.add(category);
+		if(!CollectionUtils.isEmpty(variableLibraries)) {
+			for(VariableLibrary vl:variableLibraries){
+				for(VariableCategory category:vl.getVariableCategories()){
+					variableCategories.add(category);
+				}
 			}
 		}
 		this.actionLibraries.addAll(actionLibraries);

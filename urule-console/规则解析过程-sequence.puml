@@ -18,6 +18,7 @@ activate KnowledgeSession
 '''执行条件判断相关逻辑'''
 KnowledgeSession-> KnowledgeSession: evaluationRete(fact)
 activate KnowledgeSession
+KnowledgeSession-> AbstractActivity: visitPahs（规则条件的解析处理）
 
 KnowledgeSession -> Agenda: execute
 activate Agenda
