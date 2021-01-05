@@ -15,6 +15,9 @@ activate PackageServletHandler
 
 user -> KnowledgeSession: fireRules
 activate KnowledgeSession
+'''执行条件判断相关逻辑'''
+KnowledgeSession-> KnowledgeSession: evaluationRete(fact)
+activate KnowledgeSession
 
 KnowledgeSession -> Agenda: execute
 activate Agenda

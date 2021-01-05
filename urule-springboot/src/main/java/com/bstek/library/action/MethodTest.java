@@ -68,4 +68,8 @@ public class MethodTest {
         }
 
     }
+
+    public boolean ltZero(int a,int b){
+        return a/b >1;
+    }
 }

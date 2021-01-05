@@ -16,10 +16,7 @@
 package com.bstek.urule.runtime.rete;
 
 import com.bstek.urule.RuleException;
-import com.bstek.urule.model.rule.lhs.Criteria;
-import com.bstek.urule.model.rule.lhs.Criterion;
-import com.bstek.urule.model.rule.lhs.Junction;
-import com.bstek.urule.model.rule.lhs.Or;
+import com.bstek.urule.model.rule.lhs.*;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -52,6 +49,7 @@ public abstract class AbstractActivity implements Activity {
         }
         List<FactTracker> trackers = null;
         int size = paths.size();
+        int exceptionCount = 0;
         for (int i = 0; i < size; i++) {
             Path path = paths.get(i);
             Collection<FactTracker> results = null;
@@ -67,19 +65,24 @@ public abstract class AbstractActivity implements Activity {
                     results = activity.enter(context, obj, tracker.newSubFactTracker(), newVariableMap);
                 } catch (Exception e) {
                     Junction parent = ((CriteriaActivity) activity).getCriteria().getParent();
+                    if(parent instanceof And) {
+                        throw new RuleException("规则校验异常！");
+                    }
                     int parentHashCode = System.identityHashCode(((CriteriaActivity) activity).getCriteria().getParent());
                     int nextPathParentHashCode = getNextPathObjAddress(i, size);
                     Junction junction = parsePath(parent);
                     int childNum = countChildNum(junction.getCriterions(), 0);
+                    exceptionCount ++;
                     if (parent instanceof Or
-                            //说明是最后一个“或”条件
+                            //全部“或”条件异常，才抛出异常
                             && parentHashCode != nextPathParentHashCode) {
-                        if (parent.getParent() instanceof Or && i == childNum - 1) {
+                        if (parent.getParent() instanceof Or && exceptionCount==childNum) {
                             throw new RuleException("规则校验异常！");
                         }
 
                     }
                 }
+
             } else {
                 results = activity.enter(context, obj, tracker, variableMap);
             }

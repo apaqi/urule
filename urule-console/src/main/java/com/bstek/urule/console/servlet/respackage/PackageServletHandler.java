@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.bstek.urule.BizUtils;
-import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.knowledge.KnowledgeHelper;
 import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.variable.*;
@@ -610,7 +609,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 */
 	@SuppressWarnings({ "unchecked"})
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		Parameter leftPartParameter = BizUtils.buildSimpleParameter("username", Datatype.String, "王五");
+		Parameter leftPartParameter = BizUtils.buildSimpleParameter("username", Datatype.String, "张三");
 		/**规则组1*/
 		/**规则组1--规则1*/
 		MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "evalTest", leftPartParameter);
@@ -620,8 +619,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 				.setValue(SimpleValue.instance("true"));
 
 		/**规则组1--规则2*/
-		Parameter leftPart2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "李四二");
-		MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "evalTest", leftPart2Parameter);
+
+		Parameter a = BizUtils.buildSimpleParameter("a", Datatype.Integer, "3");
+		Parameter b = BizUtils.buildSimpleParameter("b", Datatype.Integer, "2");
+		MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "ltZero", a,b);
 		Criteria criteria2 = Criteria.instance()
 				.setLeft(Left.instance(leftPart2))
 				.setOp(Op.Equals)
@@ -629,7 +630,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		Or and = Or.instance().addCriterion(false, criteria1, criteria2);
 		/**规则组2*/
 		/**规则组2 中的规则1*/
-		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "李四");
+		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "hello2");
 		MethodLeftPart orCriteriaLeftPart1 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria1Parameter);
 		Criteria orCriteria1 = Criteria.instance()
 				.setLeft(Left.instance(orCriteriaLeftPart1))
@@ -637,6 +638,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
 				.setValue(SimpleValue.instance("hello2"));
 		/**规则组2 中的规则2*/
 
+		/*
+		//todo 复杂对象场景
 		List<String> customers = new ArrayList<String>(){{
 			add("123");
 			add("546");
@@ -651,10 +654,13 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		Parameter orCriteria2Parameter = BizUtils.buildComplexObjectValueParameter("customers", Datatype.List,customers);
 		Parameter orCriteria3Parameter = BizUtils.buildComplexObjectValueParameter("maps", Datatype.Map,maps);
 		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "printUsers", orCriteria2Parameter,orCriteria3Parameter);
+*/
+		Parameter orCriteria2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello3");
+		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria2Parameter);
 		Criteria orCriteria2 = Criteria.instance()
 				.setLeft(Left.instance(orCriteriaLeftPart2))
 				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("hello"));
+				.setValue(SimpleValue.instance("hello2"));
 		Or or = Or.instance().addCriterion(false, orCriteria1, orCriteria2);
 		Lhs lhs = Lhs.instance().setCriterion(Or.instance().addCriterion(true, and, or));
 
@@ -695,7 +701,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			variableCategories.add(variableCategory);
 
 			//todo
-			VariableCategory variableCategory2 = new VariableCategory();
+			/*VariableCategory variableCategory2 = new VariableCategory();
 			variableCategory2.setClazz("java.util.List");
 			variableCategory2.setName("参数");//list参数
 			variableCategory2.setType(CategoryType.Clazz);
@@ -707,7 +713,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 			variable3.setName("customers");
 			variables2.add(variable3);
 			variableCategory2.setVariables(variables2);
-			variableCategories.add(variableCategory2);
+			variableCategories.add(variableCategory2);*/
 
 			variableLibrary.setVariableCategories(variableCategories);
 			variableCategoryLibs.add(variableLibrary);
