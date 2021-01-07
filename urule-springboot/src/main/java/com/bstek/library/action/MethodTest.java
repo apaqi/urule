@@ -18,8 +18,10 @@ public class MethodTest {
         System.out.println("#####################################" + hello);
         if("hello".equals(hello)) {
             return "hello";
+        }else if("exception".equals(hello)){
+            throw new RuntimeException("exception，异常了！");
         }else {
-            throw new RuntimeException("不是hello，异常了！");
+            return "falseStr";
         }
     }
     //@ExposeAction(value="方法1",parameters={"用户名"})

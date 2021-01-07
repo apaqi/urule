@@ -609,10 +609,10 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 */
 	@SuppressWarnings({ "unchecked"})
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		Parameter leftPartParameter = BizUtils.buildSimpleParameter("username", Datatype.String, "张三");
+		Parameter leftPartParameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello23");
 		/**规则组1*/
 		/**规则组1--规则1*/
-		MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "evalTest", leftPartParameter);
+		MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "hello", leftPartParameter);
 		Criteria criteria1 = Criteria.instance()
 				.setLeft(Left.instance(leftPart))
 				.setOp(Op.Equals)
@@ -620,14 +620,23 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
 		/**规则组1--规则2*/
 
-		Parameter a = BizUtils.buildSimpleParameter("a", Datatype.Integer, "3");
-		Parameter b = BizUtils.buildSimpleParameter("b", Datatype.Integer, "2");
+		Parameter a = BizUtils.buildSimpleParameter("a", Datatype.Integer, "5");
+		Parameter b = BizUtils.buildSimpleParameter("b", Datatype.Integer, "4");
 		MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "ltZero", a,b);
 		Criteria criteria2 = Criteria.instance()
 				.setLeft(Left.instance(leftPart2))
 				.setOp(Op.Equals)
 				.setValue(SimpleValue.instance("true"));
-		Or and = Or.instance().addCriterion(false, criteria1, criteria2);
+
+		/**规则组1--规则3*/
+
+		MethodLeftPart leftPart3 = BizUtils.buildMethodLeftPart("methodTest", "hello",
+				BizUtils.buildSimpleParameter("username", Datatype.String, "exception2"));
+		Criteria criteria3 = Criteria.instance()
+				.setLeft(Left.instance(leftPart3))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+		Or and = Or.instance().addCriterion(false, criteria1, criteria2, criteria3);
 		/**规则组2*/
 		/**规则组2 中的规则1*/
 		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "hello2");
@@ -726,7 +735,7 @@ public class PackageServletHandler extends RenderPageServletHandler {
 		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
 		List<RuleInfo> firedRules=res.getFiredRules();
 		List<RuleInfo> matchedRules=res.getMatchedRules();
-		System.out.println();
+ 		System.out.println();
 	}
 
 	/**

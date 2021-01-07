@@ -131,19 +131,19 @@ public class KnowledgeHelper implements ApplicationContextAware {
      * @param rhs
      * @param variableCategoryLibs
      * @return com.bstek.urule.builder.KnowledgeBase
-     * @Description 根据规则集构造知识包
+     * @Description 根据规则集构造知识包（注意：不能缓存，因为每次请求的 lhs 不一样。）
      * @Author wpx
      * @Date 2020/12/29 13:44
      */
     private KnowledgeBase buildKnowledgeBaseByRuleSet(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
-        KnowledgeBase knowledgeBase = KNOWLEDGE_CACHE.getIfPresent(ruleId);
-        if (null == knowledgeBase) {
+        //KnowledgeBase knowledgeBase = KNOWLEDGE_CACHE.getIfPresent(ruleId);
+       // if (null == knowledgeBase) {
             RuleSet ruleSet = new RuleSet();
             ruleSet.setRemark("RuleRegister");
             ruleSet.setRules(Arrays.asList(this.buildRule(lhs, other, rhs)));
-            knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variableCategoryLibs);
-            KNOWLEDGE_CACHE.put(ruleId, knowledgeBase);
-        }
+            KnowledgeBase knowledgeBase = knowledgeBuilder.buildKnowledgeBase(ruleSet, variableCategoryLibs);
+           // KNOWLEDGE_CACHE.put(ruleId, knowledgeBase);
+       // }
         return knowledgeBase;
     }
 

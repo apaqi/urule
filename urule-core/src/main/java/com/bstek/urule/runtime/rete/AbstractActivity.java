@@ -70,15 +70,20 @@ public abstract class AbstractActivity implements Activity {
                     }
                     int parentHashCode = System.identityHashCode(((CriteriaActivity) activity).getCriteria().getParent());
                     int nextPathParentHashCode = getNextPathObjAddress(i, size);
-                    Junction junction = parsePath(parent);
-                    int childNum = countChildNum(junction.getCriterions(), 0);
+                    //Junction junction = parsePath(parent);
+                    //int childNum = countChildNum(junction.getCriterions(), 0);
                     exceptionCount ++;
                     if (parent instanceof Or
-                            //全部“或”条件异常，才抛出异常
+                            //方案一：如果存在“或”条件为false，且无条件为true场景下，有条件异常时，应该返回异常
                             && parentHashCode != nextPathParentHashCode) {
-                        if (parent.getParent() instanceof Or && exceptionCount==childNum) {
+                        if (parent.getParent() instanceof Or && null == context.getPrevActivity()) {
                             throw new RuleException("规则校验异常！");
                         }
+                        /*
+                        //方案二：全部“或”条件异常，才抛出异常
+                        if (parent.getParent() instanceof Or && exceptionCount == childNum) {
+                            throw new RuleException("规则校验异常！");
+                        }*/
 
                     }
                 }
