@@ -72,12 +72,9 @@ public class BuiltInActionLibraryBuilder implements ApplicationContextAware{
 	}
 
 	/**
-	 * @Description  新增注册spring bean 方法
-	 *
-	 * @Author wpx
-	 * @Date 2020/12/23 14:31
-	 * @param name
-	 * @return java.util.List<com.bstek.urule.model.library.action.SpringBean>
+	 * 新增注册spring bean 方法
+	 * @param name bean名称
+	 * @return SpringBean SpringBean
 	 */
 	public List<SpringBean> addActionBean(String name) throws BeansException {
 		ApplicationContext context= Utils.getApplicationContext();
@@ -99,12 +96,10 @@ public class BuiltInActionLibraryBuilder implements ApplicationContextAware{
 	}
 
 	/**
-	 * @Description  构造用户自定义bean方法
+	 * 构造用户自定义bean方法
 	 *
-	 * @Author wpx
-	 * @Date 2020/12/23 14:30
-	 * @param methods
-	 * @return java.util.List<com.bstek.urule.model.library.action.Method>
+	 * @param methods 方法集合
+	 * @return Method 方法集合
 	 */
 	private List<com.bstek.urule.model.library.action.Method> buildConsumerMethod(Method[] methods){
 		List<com.bstek.urule.model.library.action.Method> list=new ArrayList<com.bstek.urule.model.library.action.Method>();

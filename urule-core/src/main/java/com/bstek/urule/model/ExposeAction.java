@@ -29,8 +29,5 @@ import java.lang.annotation.Target;
 public @interface ExposeAction {
 	public String value();
 
-	/**
-	 * 参数信息
-	 */
 	public String[] parameters();
 }

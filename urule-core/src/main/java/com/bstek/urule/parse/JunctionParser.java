@@ -33,8 +33,8 @@ public class JunctionParser extends CriterionParser {
 	 * 1.递归调用CriterionParser.parseCriterion 方法，处理元素递归解析
 	 * 2.处理and or 问题
 	 *
-	 * @param element
-	 * @return
+	 * @param element element
+	 * @return Criterion  Criterion
 	 */
 	@Override
 	public Criterion parse(Element element) {

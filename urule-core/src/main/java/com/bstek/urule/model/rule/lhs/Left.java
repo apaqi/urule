@@ -32,7 +32,7 @@ public class Left {
     /**
      * 获取Left实例
      *
-     * @return Left
+     * @return Left Left
      */
     public static Left instance() {
         return new Left();
@@ -41,8 +41,8 @@ public class Left {
     /**
      * 根据leftPart构造Left
      *
-     * @param leftPart
-     * @return
+     * @param leftPart leftPart
+     * @return Left Left
      */
     public static Left instance(LeftPart leftPart) {
         Left left = new Left();

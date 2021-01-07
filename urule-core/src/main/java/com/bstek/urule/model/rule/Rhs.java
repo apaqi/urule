@@ -48,7 +48,7 @@ public class Rhs {
 	/**
 	 * 获取实例
 	 *
-	 * @return
+	 * @return Rhs Rhs
 	 */
 	public static Rhs instance(){
 		return new Rhs();

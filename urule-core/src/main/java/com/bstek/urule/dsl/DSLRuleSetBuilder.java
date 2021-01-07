@@ -44,9 +44,9 @@ public class DSLRuleSetBuilder implements ApplicationContextAware{
 
 	/**
 	 * DSL 规则set构造
-	 * @param script
-	 * @return
-	 * @throws IOException
+	 * @param script script
+	 * @return RuleSet RuleSet
+	 * @throws IOException IOException
 	 */
 	public RuleSet build(String script) throws IOException{
 		ANTLRInputStream antlrInputStream=new ANTLRInputStream(script);

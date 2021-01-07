@@ -83,9 +83,9 @@ public class ReteBuilder implements ApplicationContextAware{
 	/**
 	 * 构造规则树
 	 *
-	 * @param context
-	 * @param criterion
-	 * @return
+	 * @param context context
+	 * @param criterion criterion
+	 * @return BaseReteNode BaseReteNode
 	 */
 	public static BaseReteNode buildCriterion(BuildContext context,Criterion criterion) {
 		BaseReteNode prevNode=null;

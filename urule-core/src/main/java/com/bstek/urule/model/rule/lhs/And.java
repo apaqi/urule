@@ -34,8 +34,8 @@ public class And extends Junction {
 	/**
 	 *
 	 * @param isRoot 是否是根节点 and 条件
-	 * @param criterions
-	 * @return
+	 * @param criterions criterions
+	 * @return And And
 	 */
 	public And addCriterion(boolean isRoot, Criterion... criterions) {
 		if (null != criterions) {
@@ -52,8 +52,8 @@ public class And extends Junction {
 	/**
 	 *
 	 * @param isRoot 是否是根节点 and 条件
-	 * @param criterions
-	 * @return
+	 * @param criterions criterions
+	 * @return And And
 	 */
 	public And setCriterions(boolean isRoot, List<Criterion> criterions) {
 		if (null != criterions) {

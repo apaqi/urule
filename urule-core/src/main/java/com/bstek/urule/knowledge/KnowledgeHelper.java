@@ -36,8 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author wpx
- * @Description 类注释
- * @date 2020/12/29
+ * @since  2020/12/29
  */
 public class KnowledgeHelper implements ApplicationContextAware {
     protected ApplicationContext applicationContext;
@@ -45,13 +44,13 @@ public class KnowledgeHelper implements ApplicationContextAware {
     private KnowledgeBuilder knowledgeBuilder;
 
     /**
-     * @param ruleId
-     * @param lhs
-     * @param variableCategoryLibs
-     * @return com.bstek.urule.runtime.response.ExecutionResponse
-     * @Description 执行规则
-     * @Author wpx
-     * @Date 2020/12/29 14:09
+     * 执行规则
+     * @param ruleId ruleId
+     * @param lhs lhs
+     * @param variableCategoryLibs variableCategoryLibs
+     * @return com.bstek.urule.runtime.response.ExecutionResponse ExecutionResponse
+     * @author wpx
+     * @since  2020/12/29 14:09
      */
     public ExecutionResponse execute(String ruleId, Lhs lhs, List<VariableLibrary> variableCategoryLibs) {
         Rhs rhs = Rhs.instance();
@@ -65,15 +64,15 @@ public class KnowledgeHelper implements ApplicationContextAware {
 
 
     /**
-     * @param ruleId
-     * @param lhs
-     * @param other
-     * @param rhs
-     * @param variableCategoryLibs
-     * @return com.bstek.urule.runtime.response.ExecutionResponse
-     * @Description 执行规则
-     * @Author wpx
-     * @Date 2020/12/29 14:09
+     * 执行规则
+     * @author wpx
+     * @param ruleId ruleId
+     * @param lhs lhs
+     * @param other other
+     * @param rhs rhs
+     * @param variableCategoryLibs variableCategoryLibs
+     * @return com.bstek.urule.runtime.response.ExecutionResponse ExecutionResponse
+     * @since  2020/12/29 14:09
      */
     public ExecutionResponse execute(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
         KnowledgeBase knowledgeBase = this.buildKnowledgeBaseByRuleSet(ruleId, lhs, other, rhs, variableCategoryLibs);
@@ -102,8 +101,8 @@ public class KnowledgeHelper implements ApplicationContextAware {
     /**
      * 构造参数
      *
-     * @param knowledgeBase
-     * @return
+     * @param knowledgeBase knowledgeBase
+     * @return Map Map
      */
     private Map<VariableCategory, Object> buildFacts(KnowledgeBase knowledgeBase) {
         Map<VariableCategory, Object> facts = new HashMap<VariableCategory, Object>();
@@ -125,15 +124,16 @@ public class KnowledgeHelper implements ApplicationContextAware {
     }
 
     /**
-     * @param ruleId
-     * @param lhs
-     * @param other
-     * @param rhs
-     * @param variableCategoryLibs
-     * @return com.bstek.urule.builder.KnowledgeBase
-     * @Description 根据规则集构造知识包（注意：不能缓存，因为每次请求的 lhs 不一样。）
-     * @Author wpx
-     * @Date 2020/12/29 13:44
+     * 根据规则集构造知识包（注意：不能缓存，因为每次请求的 lhs 不一样。）
+     *
+     * @param ruleId ruleId
+     * @param lhs lhs
+     * @param other other
+     * @param rhs rhs
+     * @param variableCategoryLibs variableCategoryLibs
+     * @return com.bstek.urule.builder.KnowledgeBase KnowledgeBase
+     * @author wpx
+     * @since  2020/12/29 13:44
      */
     private KnowledgeBase buildKnowledgeBaseByRuleSet(String ruleId, Lhs lhs, Other other, Rhs rhs, List<VariableLibrary> variableCategoryLibs) {
         //KnowledgeBase knowledgeBase = KNOWLEDGE_CACHE.getIfPresent(ruleId);

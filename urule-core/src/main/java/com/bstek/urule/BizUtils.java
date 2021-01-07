@@ -12,8 +12,7 @@ import java.util.List;
 
 /**
  * @author wpx
- * @Description 类注释
- * @date 2020/12/23
+ * @since 2020/12/23
  */
 public class BizUtils {
 
@@ -24,7 +23,7 @@ public class BizUtils {
      * @param methodId     方法签名
      * @param desiredValue 期望值
      * @param parameters   参数列表
-     * @return
+     * @return Criteria Criteria
      */
     public static Criteria buildMethodLeftCriteria(String beanId, String methodId, Boolean desiredValue, Parameter... parameters) {
         Criteria criteria = new Criteria();
@@ -44,8 +43,9 @@ public class BizUtils {
     /**
      * 构建参数信息
      *
-     * @param parameter
-     * @return
+     * @param op  op
+     * @param parameter parameter
+     * @return Criteria Criteria
      */
     public static Criteria buildVariableLeftCriteria(Op op, Parameter parameter) {
         Criteria criteria = new Criteria();
@@ -62,10 +62,10 @@ public class BizUtils {
     /**
      * 构建方法左侧部分
      *
-     * @param beanId
-     * @param methodId
-     * @param parameters
-     * @return
+     * @param beanId     beanId
+     * @param methodId   methodId
+     * @param parameters parameters
+     * @return MethodLeftPart MethodLeftPart
      */
     public static MethodLeftPart buildMethodLeftPart(String beanId, String methodId, Parameter... parameters) {
         MethodLeftPart leftPart = new MethodLeftPart();
@@ -85,8 +85,8 @@ public class BizUtils {
     /**
      * 构建方法左侧部分
      *
-     * @param parameter
-     * @return
+     * @param parameter parameter
+     * @return VariableLeftPart VariableLeftPart
      */
     public static VariableLeftPart buildVariableLeftPart(Parameter parameter) {
         VariableLeftPart leftPart = new VariableLeftPart();
@@ -100,10 +100,10 @@ public class BizUtils {
     /**
      * 构建简捷参数
      *
-     * @param parName
-     * @param type
-     * @param content
-     * @return
+     * @param parName parName
+     * @param type    type
+     * @param content content
+     * @return Parameter Parameter
      */
     public static Parameter buildSimpleParameter(String parName, Datatype type, String content) {
         Parameter parameter = new Parameter();
@@ -118,10 +118,10 @@ public class BizUtils {
     /**
      * 构建变量参数
      *
-     * @param parName
-     * @param type
-     * @param varName
-     * @return
+     * @param parName parName
+     * @param type    type
+     * @param varName varName
+     * @return Parameter Parameter
      */
     public static Parameter buildVariableParameter(String parName, Datatype type, String varName) {
         Parameter parameter = new Parameter();
@@ -138,10 +138,10 @@ public class BizUtils {
     /**
      * 构建变量参数
      *
-     * @param parName
-     * @param type
-     * @param obj
-     * @return
+     * @param parName parName
+     * @param type    type
+     * @param obj     obj
+     * @return Parameter Parameter
      */
     public static Parameter buildComplexObjectValueParameter(String parName, Datatype type, Object obj) {
         Parameter parameter = new Parameter();
@@ -157,10 +157,10 @@ public class BizUtils {
     /**
      * 构建统一规则结尾信息
      *
-     * @param flag
-     * @param datatype
-     * @param content
-     * @return
+     * @param flag     flag
+     * @param datatype datatype
+     * @param content  content
+     * @return Action Action
      */
     public static Action buildVariableAssignAction(String flag, Datatype datatype, String content) {
         VariableAssignAction variableAssignAction = new VariableAssignAction();
@@ -176,10 +176,10 @@ public class BizUtils {
     /**
      * 构建Methonaction
      *
-     * @param beanId
-     * @param methodName
-     * @param paramList
-     * @return
+     * @param beanId     beanId
+     * @param methodName methodName
+     * @param paramList  paramList
+     * @return ExecuteMethodAction ExecuteMethodAction
      */
     public static ExecuteMethodAction buildMethodAction(String beanId, String methodName, List<Parameter> paramList) {
         ExecuteMethodAction methodAction = new ExecuteMethodAction();

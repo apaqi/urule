@@ -27,8 +27,8 @@ public class RuleParser extends AbstractRuleParser<Rule> {
 	/**
 	 * 规则解析
 	 *
-	 * @param element
-	 * @return
+	 * @param element 元素
+	 * @return Rule 规则
 	 */
 	public Rule parse(Element element) {
 		Rule rule=new Rule();

@@ -16,8 +16,8 @@
 package com.bstek.urule.model.rule;
 
 /**
- * @Description
- * @Author wpx
+ * 复杂对象支持
+ * @author wpx
 
  */
 public class ComplexObjectValue extends AbstractValue {

@@ -29,9 +29,9 @@ public class Or extends Junction {
 
 	/**
 	 * 添加 OR 条件规则项
-	 * @param isRoot
-	 * @param criterions
-	 * @return
+	 * @param isRoot isRoot
+	 * @param criterions criterions
+	 * @return Or Or
 	 */
 	public Or addCriterion(boolean isRoot, Criterion... criterions) {
 		if (null != criterions) {
@@ -50,8 +50,8 @@ public class Or extends Junction {
 	 *添加 OR 条件规则项
 	 *
 	 * @param isRoot 是否是根节点 OR 条件
-	 * @param criterions
-	 * @return
+	 * @param criterions criterions
+	 * @return Or Or
 	 */
 	public Or setCriterions(boolean isRoot, List<Criterion> criterions) {
 		if (null != criterions) {

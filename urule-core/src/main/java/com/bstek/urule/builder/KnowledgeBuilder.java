@@ -71,9 +71,9 @@ public class KnowledgeBuilder extends AbstractBuilder {
      * 4.循环调用resourceBuilders，解析xml到各类规则文件中
      * 5.构建Rete树
      *
-     * @param resourceBase
-     * @return
-     * @throws IOException
+     * @param resourceBase resourceBase
+     * @return KnowledgeBase KnowledgeBase
+     * @throws IOException IOException
      */
     public KnowledgeBase buildKnowledgeBase(ResourceBase resourceBase) throws IOException {
         KnowledgePackageService knowledgePackageService = (KnowledgePackageService) applicationContext.getBean(KnowledgePackageService.BEAN_ID);
@@ -179,10 +179,11 @@ public class KnowledgeBuilder extends AbstractBuilder {
     }
 
     /**
-     * @param ruleSet
-     * @return com.bstek.urule.builder.KnowledgeBase
-     * @Description 根据RuleSet构建知识包
-     * @Date 2020/12/22 14:17
+     * 根据RuleSet构建知识包
+     *
+     * @param ruleSet  ruleSet
+     * @return com.bstek.urule.builder.KnowledgeBase KnowledgeBase
+     * @since  2020/12/22 14:17
      */
     public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet) {
         List<Rule> rules = new ArrayList<Rule>();
@@ -198,9 +199,9 @@ public class KnowledgeBuilder extends AbstractBuilder {
 
     /**
      * 根据规则集和资源库构造知识库
-     * @param ruleSet
-     * @param variableCategoryLibs
-     * @return
+     * @param ruleSet ruleSet
+     * @param  variableCategoryLibs variableCategoryLibs
+     * @return KnowledgeBase KnowledgeBase
      */
     public KnowledgeBase buildKnowledgeBase(RuleSet ruleSet, List<VariableLibrary> variableCategoryLibs) {
         List<Rule> rules = new ArrayList<Rule>();
@@ -255,11 +256,13 @@ public class KnowledgeBuilder extends AbstractBuilder {
     }
 
     /**
-     * @param xml
-     * @return com.bstek.urule.builder.KnowledgeBase
-     * @Description 根据规则xml文件生成知识包
-     * @Author wpx
-     * @Date 2020/12/22 14:19
+     * 根据规则xml文件生成知识包
+     *
+     * @param xml xml
+     * @return com.bstek.urule.builder.KnowledgeBase KnowledgeBase
+     * @author wpx
+     * @since  2020/12/22 14:19
+     * @throws  IOException IOException
      */
     public KnowledgeBase buildKnowledgeBase(String xml) throws IOException {
 

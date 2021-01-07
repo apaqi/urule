@@ -70,8 +70,8 @@ public class RhsParser implements Parser<Rhs>,ApplicationContextAware {
 	 * 注入动作解析 ActionParser
 	 * 动作解析不用递归处理
 	 *
-	 * @param context
-	 * @throws BeansException
+	 * @param context 上下文
+	 * @throws BeansException bean解析异常
 	 */
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 		actionParsers=context.getBeansOfType(ActionParser.class).values();
