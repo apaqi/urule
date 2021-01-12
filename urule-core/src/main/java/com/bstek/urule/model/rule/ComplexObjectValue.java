@@ -51,7 +51,7 @@ public class ComplexObjectValue extends AbstractValue {
         return new ComplexObjectValue();
     }
 
-    public static ComplexObjectValue instance(String content) {
+    public static ComplexObjectValue instance(Object content) {
         ComplexObjectValue simpleValue = new ComplexObjectValue();
         simpleValue.setContent(content);
         return simpleValue;

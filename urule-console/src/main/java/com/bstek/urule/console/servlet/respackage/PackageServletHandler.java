@@ -27,12 +27,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.bstek.urule.BizUtils;
+import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.knowledge.KnowledgeHelper;
 import com.bstek.urule.model.library.action.ActionConfig;
 import com.bstek.urule.model.library.variable.*;
 import com.bstek.urule.model.rete.JsonUtils;
 import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.*;
+import com.bstek.urule.script.ScriptType;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -609,132 +611,9 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	 */
 	@SuppressWarnings({ "unchecked"})
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-		Parameter leftPartParameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello23");
-		/**规则组1*/
-		/**规则组1--规则1*/
-		MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "hello", leftPartParameter);
-		Criteria criteria1 = Criteria.instance()
-				.setLeft(Left.instance(leftPart))
-				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("true"));
-
-		/**规则组1--规则2*/
-
-		Parameter a = BizUtils.buildSimpleParameter("a", Datatype.Integer, "5");
-		Parameter b = BizUtils.buildSimpleParameter("b", Datatype.Integer, "4");
-		MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "ltZero", a,b);
-		Criteria criteria2 = Criteria.instance()
-				.setLeft(Left.instance(leftPart2))
-				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("true"));
-
-		/**规则组1--规则3*/
-
-		MethodLeftPart leftPart3 = BizUtils.buildMethodLeftPart("methodTest", "hello",
-				BizUtils.buildSimpleParameter("username", Datatype.String, "exception2"));
-		Criteria criteria3 = Criteria.instance()
-				.setLeft(Left.instance(leftPart3))
-				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("true"));
-		Or and = Or.instance().addCriterion(false, criteria1, criteria2, criteria3);
-		/**规则组2*/
-		/**规则组2 中的规则1*/
-		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "hello2");
-		MethodLeftPart orCriteriaLeftPart1 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria1Parameter);
-		Criteria orCriteria1 = Criteria.instance()
-				.setLeft(Left.instance(orCriteriaLeftPart1))
-				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("hello2"));
-		/**规则组2 中的规则2*/
-
-		/*
-		//todo 复杂对象场景
-		List<String> customers = new ArrayList<String>(){{
-			add("123");
-			add("546");
-		}};
-		Map<String,DefaultUser> maps = new HashMap<String,DefaultUser>(){{
-			DefaultUser defaultUser = new DefaultUser();
-			defaultUser.setAdmin(true);
-			defaultUser.setCompanyId("33454");
-			put("001",defaultUser);
-		}};
-
-		Parameter orCriteria2Parameter = BizUtils.buildComplexObjectValueParameter("customers", Datatype.List,customers);
-		Parameter orCriteria3Parameter = BizUtils.buildComplexObjectValueParameter("maps", Datatype.Map,maps);
-		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "printUsers", orCriteria2Parameter,orCriteria3Parameter);
-*/
-		Parameter orCriteria2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello3");
-		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria2Parameter);
-		Criteria orCriteria2 = Criteria.instance()
-				.setLeft(Left.instance(orCriteriaLeftPart2))
-				.setOp(Op.Equals)
-				.setValue(SimpleValue.instance("hello2"));
-		Or or = Or.instance().addCriterion(false, orCriteria1, orCriteria2);
-		Lhs lhs = Lhs.instance().setCriterion(Or.instance().addCriterion(true, and, or));
-
-		Rhs rhs = Rhs.instance();
-		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
-
-		Other other = new Other();
-		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
-
-		List<Variable> variables = new ArrayList<>();
-		Variable variable = new Variable();
-		variable.setType(Datatype.String);
-		variable.setLabel("username");
-		variable.setName("username");
-		variables.add(variable);
-
-
-		Variable variable2 = new Variable();
-		variable2.setType(Datatype.String);
-		variable2.setLabel("hello");
-		variable2.setName("hello");
-		variables.add(variable2);
-		//ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, variables);
-
-
-		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
-		if(!CollectionUtils.isEmpty(variables)) {
-			//依赖的变量
-			VariableLibrary variableLibrary = new VariableLibrary();
-			//依赖的变量->变量类型，只支持map结构
-			List<VariableCategory> variableCategories = new ArrayList<>();
-			VariableCategory variableCategory = new VariableCategory();
-			variableCategory.setClazz("java.util.HashMap");
-			variableCategory.setName("参数");
-			variableCategory.setType(CategoryType.Clazz);
-			//依赖的变量->变量信息
-			variableCategory.setVariables(variables);
-			variableCategories.add(variableCategory);
-
-			//todo
-			/*VariableCategory variableCategory2 = new VariableCategory();
-			variableCategory2.setClazz("java.util.List");
-			variableCategory2.setName("参数");//list参数
-			variableCategory2.setType(CategoryType.Clazz);
-			//依赖的变量->变量信息
-			List<Variable> variables2 = new ArrayList<>();
-			Variable variable3 = new Variable();
-			variable3.setType(Datatype.List);
-			variable3.setLabel("customers");
-			variable3.setName("customers");
-			variables2.add(variable3);
-			variableCategory2.setVariables(variables2);
-			variableCategories.add(variableCategory2);*/
-
-			variableLibrary.setVariableCategories(variableCategories);
-			variableCategoryLibs.add(variableLibrary);
-		}
-
-
-
-
-		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
-		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
-		List<RuleInfo> firedRules=res.getFiredRules();
-		List<RuleInfo> matchedRules=res.getMatchedRules();
+		//testRuleGroup(req, resp);
+		testScriptMethodRule(req,  resp);
+		//doTest_back(req,  resp);
  		System.out.println();
 	}
 
@@ -972,4 +851,178 @@ public class PackageServletHandler extends RenderPageServletHandler {
 
 	private final static String TEST_RULR_XML="<?xml version=\"1.0\" encoding=\"UTF-8\"?><rule-set><import-variable-library path=\"jcr:/demo/demo.vl.xml\"/><import-action-library path=\"jcr:/demo/actiondemo.al.xml\"/><remark><![CDATA[]]></remark><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><or><atom op=\"GreaterThen\"><left var-category=\"用户\" var=\"age\" var-label=\"年龄\" datatype=\"Integer\" type=\"variable\"></left><value  content=\"10\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" type=\"variable\"></left><value  content=\"wpx\" type=\"Input\" ></value></atom></or></if><then><console-print><value  content=\"123\" type=\"Input\" ></value></console-print></then><else></else></rule><rule name=\"rule\" enabled=\"true\"><remark><![CDATA[]]></remark><if><and><atom op=\"Equals\"><left var-category=\"用户\" var=\"gender\" var-label=\"性别\" datatype=\"Boolean\" type=\"variable\"></left><value  content=\"true\" type=\"Input\" ></value></atom><atom op=\"Contain\"><left var-category=\"用户\" var=\"mobile\" var-label=\"手机号\" datatype=\"String\" type=\"variable\"></left><value  content=\"153\" type=\"Input\" ></value></atom></and></if><then><console-print><value  content=\"2132134\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set>";
 	private final static String TEST_RULR_XML_V2="<?xml version=\"1.0\" encoding=\"UTF-8\"?><rule-set><remark><![CDATA[]]></remark><rule name=\"rule\"><remark><![CDATA[]]></remark><if><and><atom op=\"GreaterThen\"><left  var-category=\"参数\" var=\"商品id\" var-label=\"skuId\" datatype=\"Long\" type=\"parameter\"></left><value  content=\"10\" type=\"Input\" ></value></atom><or><atom op=\"Contain\"><left  var-category=\"参数\" var=\"商品名称\" var-label=\"skuName\" datatype=\"String\" type=\"parameter\"></left><value  content=\"测试\" type=\"Input\" ></value></atom></or></and></if><then><console-print><value  content=\"21321\" type=\"Input\" ></value></console-print></then><else></else></rule></rule-set>";
+
+	/**
+	 * 规则组测试
+	 *
+	 * @param  req req
+	 * @param resp resp
+	 */
+	private void testRuleGroup(HttpServletRequest req, HttpServletResponse resp){
+		Parameter leftPartParameter = BizUtils.buildComplexObjectValueParameter("users", Datatype.String,"users");
+
+		/**规则组1*/
+		/**规则组1--规则1*/
+		MethodLeftPart leftPart = BizUtils.buildMethodLeftPart("methodTest", "containsTest", leftPartParameter);
+		Criteria criteria1 = Criteria.instance()
+				.setLeft(Left.instance(leftPart))
+				.setOp(Op.Contain)
+				.setValue(ComplexObjectValue.instance(Arrays.asList("32","432")));
+
+		/**规则组1--规则2*/
+
+		Parameter a = BizUtils.buildSimpleParameter("a", Datatype.Integer, "5");
+		Parameter b = BizUtils.buildSimpleParameter("b", Datatype.Integer, "4");
+		MethodLeftPart leftPart2 = BizUtils.buildMethodLeftPart("methodTest", "ltZero", a,b);
+		Criteria criteria2 = Criteria.instance()
+				.setLeft(Left.instance(leftPart2))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+
+		/**规则组1--规则3*/
+
+		MethodLeftPart leftPart3 = BizUtils.buildMethodLeftPart("methodTest", "hello",
+				BizUtils.buildSimpleParameter("username", Datatype.String, "exception2"));
+		Criteria criteria3 = Criteria.instance()
+				.setLeft(Left.instance(leftPart3))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("true"));
+		Or and = Or.instance().addCriterion(false, criteria1, criteria2, criteria3);
+		/**规则组2*/
+		/**规则组2 中的规则1*/
+		Parameter orCriteria1Parameter = BizUtils.buildSimpleParameter("hello", Datatype.String, "hello");
+		MethodLeftPart orCriteriaLeftPart1 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria1Parameter);
+		Criteria orCriteria1 = Criteria.instance()
+				.setLeft(Left.instance(orCriteriaLeftPart1))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("hello2"));
+		/**规则组2 中的规则2*/
+
+		Parameter orCriteria2Parameter = BizUtils.buildSimpleParameter("username", Datatype.String, "hello3");
+		MethodLeftPart orCriteriaLeftPart2 = BizUtils.buildMethodLeftPart("methodTest", "hello", orCriteria2Parameter);
+		Criteria orCriteria2 = Criteria.instance()
+				.setLeft(Left.instance(orCriteriaLeftPart2))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("hello2"));
+		Or or = Or.instance().addCriterion(false, orCriteria1, orCriteria2);
+		Lhs lhs = Lhs.instance().setCriterion(or);
+
+		Rhs rhs = Rhs.instance();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("username");
+		variable.setName("username");
+		variables.add(variable);
+
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.String);
+		variable2.setLabel("hello");
+		variable2.setName("hello");
+		variables.add(variable2);
+
+		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			VariableLibrary variableLibrary = new VariableLibrary();
+			//依赖的变量->变量类型，只支持map结构
+			List<VariableCategory> variableCategories = new ArrayList<>();
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("java.util.HashMap");
+			variableCategory.setName("参数");
+			variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+			variableLibrary.setVariableCategories(variableCategories);
+			variableCategoryLibs.add(variableLibrary);
+		}
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
+
+
+
+	/**
+	 * ScriptMethod测试
+	 *
+	 * @param  req req
+	 * @param resp resp
+	 */
+	private void testScriptMethodRule(HttpServletRequest req, HttpServletResponse resp){
+
+		List<String> customers = new ArrayList<String>(){{
+			add("123");
+			add("546");
+		}};
+		Map<String, DefaultUser> maps = new HashMap<String,DefaultUser>(){{
+			DefaultUser defaultUser = new DefaultUser();
+			defaultUser.setAdmin(true);
+			defaultUser.setCompanyId("33454");
+			put("001",defaultUser);
+		}};
+
+		Parameter orCriteria2Parameter = BizUtils.buildComplexObjectValueParameter("customers", Datatype.List,customers);
+		Parameter orCriteria3Parameter = BizUtils.buildComplexObjectValueParameter("maps", Datatype.Map,maps);
+		ScriptMethodLeftPart orCriteriaLeftPart = BizUtils.buildScriptMethodLeftPart("methodTest", "printUsers", ScriptType.JSONPATH, "$.tag_var_0", orCriteria2Parameter,orCriteria3Parameter);
+		Criteria orCriteria = Criteria.instance()
+				.setLeft(Left.instance(orCriteriaLeftPart))
+				.setOp(Op.Equals)
+				.setValue(SimpleValue.instance("hello2"));
+		Or or = Or.instance().addCriterion(false, orCriteria);
+		Lhs lhs = Lhs.instance().setCriterion(or);
+
+		Rhs rhs = Rhs.instance();
+		rhs.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "true"));
+
+		Other other = new Other();
+		other.addAction(BizUtils.buildVariableAssignAction("flag", Datatype.Boolean, "false"));
+
+		List<Variable> variables = new ArrayList<>();
+		Variable variable = new Variable();
+		variable.setType(Datatype.String);
+		variable.setLabel("username");
+		variable.setName("username");
+		variables.add(variable);
+
+
+		Variable variable2 = new Variable();
+		variable2.setType(Datatype.String);
+		variable2.setLabel("hello");
+		variable2.setName("hello");
+		variables.add(variable2);
+
+		List<VariableLibrary> variableCategoryLibs = new ArrayList<VariableLibrary>();
+		if(!CollectionUtils.isEmpty(variables)) {
+			//依赖的变量
+			VariableLibrary variableLibrary = new VariableLibrary();
+			//依赖的变量->变量类型，只支持map结构
+			List<VariableCategory> variableCategories = new ArrayList<>();
+			VariableCategory variableCategory = new VariableCategory();
+			variableCategory.setClazz("java.util.HashMap");
+			variableCategory.setName("参数");
+			variableCategory.setType(CategoryType.Clazz);
+			//依赖的变量->变量信息
+			variableCategory.setVariables(variables);
+			variableCategories.add(variableCategory);
+			variableLibrary.setVariableCategories(variableCategories);
+			variableCategoryLibs.add(variableLibrary);
+		}
+
+		ExecutionResponse execute = knowledgeHelper.execute("6123:1:-1",lhs, other, rhs, null);
+		ExecutionResponseImpl res=(ExecutionResponseImpl)execute;
+		List<RuleInfo> firedRules=res.getFiredRules();
+		List<RuleInfo> matchedRules=res.getMatchedRules();
+		System.out.println();
+	}
 }

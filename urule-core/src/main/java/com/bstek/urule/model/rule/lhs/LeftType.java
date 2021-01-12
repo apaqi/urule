@@ -19,5 +19,5 @@ package com.bstek.urule.model.rule.lhs;
  * @since 2015年3月11日
  */
 public enum LeftType {
-	variable,parameter,method,function,eval,all,exist,collect,commonfunction,NamedReference;
+	variable,parameter,method,function,eval,all,exist,collect,commonfunction,NamedReference,scriptMethod;
 }

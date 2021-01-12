@@ -62,6 +62,8 @@ public class Left {
                 left.setType(LeftType.exist);
             } else if (leftPart instanceof CommonFunctionLeftPart) {
                 left.setType(LeftType.commonfunction);
+            } else if (leftPart instanceof ScriptMethodLeftPart) {
+                left.setType(LeftType.scriptMethod);
             }else {
             	throw new RuleException("does not support current leftPart,id=" + leftPart.getId());
 			}

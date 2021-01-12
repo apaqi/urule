@@ -210,6 +210,7 @@ public class KnowledgeBuilder extends AbstractBuilder {
         }
         List<ActionConfig> actionConfigs2 = this.buildActionConfigs(ruleSet);
         ResourceLibrary resourceLibrary = resourceLibraryBuilder.buildResourceLibrary(actionConfigs2, variableCategoryLibs);
+        //todo 同一个规则集，resourceLibrary 可以缓存
         Rete rete = reteBuilder.buildRete(rules, resourceLibrary);
         return new KnowledgeBase(rete, null, retriveNoLhsRules(rules));
     }

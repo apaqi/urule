@@ -17,6 +17,7 @@ package com.bstek.urule.model.rule.lhs;
 
 import java.util.List;
 
+import com.bstek.urule.action.ExecuteScriptMethodAction;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.bstek.urule.RuleException;
@@ -72,6 +73,22 @@ public class Criteria extends BaseCriterion implements BaseCriteria{
 					methodAction.setMethodName(methodPart.getMethodName());
 					methodAction.setParameters(methodPart.getParameters());
 					ActionValue actionValue=methodAction.execute(context, obj,allMatchedObjects,null);
+					if(actionValue==null){
+						leftValue=null;
+					}else{
+						leftValue=actionValue.getValue();
+					}
+				}else if(leftPart instanceof ScriptMethodLeftPart){
+					ScriptMethodLeftPart methodPart = (ScriptMethodLeftPart)leftPart;
+					ExecuteScriptMethodAction scriptMethodAction = new ExecuteScriptMethodAction();
+					scriptMethodAction.setBeanId(methodPart.getBeanId());
+					scriptMethodAction.setBeanLabel(methodPart.getBeanLabel());
+					scriptMethodAction.setMethodLabel(methodPart.getMethodLabel());
+					scriptMethodAction.setMethodName(methodPart.getMethodName());
+					scriptMethodAction.setParameters(methodPart.getParameters());
+					scriptMethodAction.setScriptType(methodPart.getScriptType());
+					scriptMethodAction.setExpression(methodPart.getExpression());
+					ActionValue actionValue = scriptMethodAction.execute(context, obj, allMatchedObjects,null);
 					if(actionValue==null){
 						leftValue=null;
 					}else{

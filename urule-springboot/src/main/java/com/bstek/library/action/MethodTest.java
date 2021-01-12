@@ -1,16 +1,16 @@
 package com.bstek.library.action;
 
+import com.alibaba.fastjson.JSON;
 import com.bstek.library.vars.Customer;
 import com.bstek.library.vars.Dept;
 import com.bstek.urule.action.ActionId;
 import com.bstek.urule.console.DefaultUser;
 import com.bstek.urule.model.ExposeAction;
+import com.bstek.urule.model.rete.JsonUtils;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MethodTest {
     //@ActionId("Hello")
@@ -59,7 +59,7 @@ public class MethodTest {
         System.out.println("Hello "+m.getName()+", has house:"+m.isHouse());
     }
 
-    public void printUsers(List<String> customers, Map<String, DefaultUser> maps){
+    public String printUsers(List<String> customers, Map<String, DefaultUser> maps){
         if (CollectionUtils.isNotEmpty(customers)) {
             customers.forEach(m->{
                 System.out.println("Hello "+m);
@@ -68,10 +68,19 @@ public class MethodTest {
         for(Map.Entry<String, DefaultUser> entry :  maps.entrySet()) {
             System.out.println("key="+entry.getKey()+"###CompanyId="+entry.getValue().getCompanyId());
         }
+        Map<String,String> map = new HashMap<String,String>(){{
+            put("tag_var_0","3456");
+        }};
 
+        return JSON.toJSONString(map);
     }
 
     public boolean ltZero(int a,int b){
         return a/b >1;
+    }
+
+    public List<String> containsTest(String users){
+        List<String> list = Arrays.asList("12","32","432","45");
+        return list;
     }
 }

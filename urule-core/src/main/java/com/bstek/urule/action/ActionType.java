@@ -19,5 +19,5 @@ package com.bstek.urule.action;
  * @since 2014年12月29日
  */
 public enum ActionType {
-	ConsolePrint,ExecuteMethod,VariableAssign,ExecuteCommonFunction,Scoring;
+	ConsolePrint,ExecuteMethod,VariableAssign,ExecuteCommonFunction,Scoring,ExecuteScriptMethod;
 }

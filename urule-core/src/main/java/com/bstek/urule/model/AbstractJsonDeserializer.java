@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.bstek.urule.action.*;
+import com.bstek.urule.script.ScriptType;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParser;
@@ -29,13 +31,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.bstek.urule.Configure;
 import com.bstek.urule.RuleException;
-import com.bstek.urule.action.Action;
-import com.bstek.urule.action.ActionType;
-import com.bstek.urule.action.ConsolePrintAction;
-import com.bstek.urule.action.ExecuteCommonFunctionAction;
-import com.bstek.urule.action.ExecuteMethodAction;
-import com.bstek.urule.action.ScoringAction;
-import com.bstek.urule.action.VariableAssignAction;
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rete.JsonUtils;
 import com.bstek.urule.model.rule.Other;
@@ -214,6 +209,18 @@ public abstract class AbstractJsonDeserializer<T> extends JsonDeserializer<T> {
 				method.setMethodName(JsonUtils.getJsonValue(jsonNode, "methodName"));
 				method.setParameters(JsonUtils.parseParameters(jsonNode));
 				actions.add(method);
+				break;
+			case ExecuteScriptMethod:
+				ExecuteScriptMethodAction scriptMethod=new ExecuteScriptMethodAction();
+				scriptMethod.setBeanId(JsonUtils.getJsonValue(jsonNode, "beanId"));
+				scriptMethod.setBeanLabel(JsonUtils.getJsonValue(jsonNode, "beanLabel"));
+				scriptMethod.setMethodLabel(JsonUtils.getJsonValue(jsonNode, "methodLabel"));
+				scriptMethod.setPriority(Integer.valueOf(JsonUtils.getJsonValue(jsonNode, "priority")));
+				scriptMethod.setMethodName(JsonUtils.getJsonValue(jsonNode, "methodName"));
+				scriptMethod.setParameters(JsonUtils.parseParameters(jsonNode));
+				scriptMethod.setScriptType(ScriptType.getByName(JsonUtils.getJsonValue(jsonNode, "scriptType")));
+				scriptMethod.setExpression(JsonUtils.getJsonValue(jsonNode, "expression"));
+				actions.add(scriptMethod);
 				break;
 			case VariableAssign:
 				VariableAssignAction assign=new VariableAssignAction();

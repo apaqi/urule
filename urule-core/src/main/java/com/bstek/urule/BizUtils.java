@@ -6,6 +6,7 @@ import com.bstek.urule.action.VariableAssignAction;
 import com.bstek.urule.model.library.Datatype;
 import com.bstek.urule.model.rule.*;
 import com.bstek.urule.model.rule.lhs.*;
+import com.bstek.urule.script.ScriptType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,33 @@ public class BizUtils {
         leftPart.setBeanLabel(beanId);
         leftPart.setMethodName(methodId);
         leftPart.setMethodLabel(methodId);
+        List<Parameter> parameterList = new ArrayList<>();
+        for (int i = 0; i < parameters.length; i++) {
+            parameterList.add(parameters[i]);
+        }
+        leftPart.setParameters(parameterList);
+        return leftPart;
+    }
+
+    /**
+     * 构建方法左侧部分
+     *
+     * @param beanId     beanId
+     * @param methodId   methodId
+     * @param parameters parameters
+     * @param scriptType 脚本类型
+     * @param expression 取值表达式
+     * @return MethodLeftPart MethodLeftPart
+     */
+    public static ScriptMethodLeftPart buildScriptMethodLeftPart(String beanId, String methodId, ScriptType scriptType,
+                                                                 String expression,Parameter... parameters) {
+        ScriptMethodLeftPart leftPart = new ScriptMethodLeftPart();
+        leftPart.setBeanId(beanId);
+        leftPart.setBeanLabel(beanId);
+        leftPart.setMethodName(methodId);
+        leftPart.setMethodLabel(methodId);
+        leftPart.setScriptType(scriptType);
+        leftPart.setExpression(expression);
         List<Parameter> parameterList = new ArrayList<>();
         for (int i = 0; i < parameters.length; i++) {
             parameterList.add(parameters[i]);
