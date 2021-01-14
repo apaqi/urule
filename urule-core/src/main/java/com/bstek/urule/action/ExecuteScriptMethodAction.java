@@ -85,7 +85,7 @@ public class ExecuteScriptMethodAction extends AbstractAction {
                 }
                 if (value != null) {
                     value = handleResult(scriptType, expression, value);
-                    return new ActionValueImpl(valueKey, value);
+                    return new ActionValueImpl(valueKey, handleResult(scriptType, expression, value));
                 } else {
                     return null;
                 }
@@ -102,8 +102,7 @@ public class ExecuteScriptMethodAction extends AbstractAction {
                     context.debugMsg(msg, MsgType.ExecuteBeanMethod, debug);
                 }
                 if (value != null) {
-                    value = handleResult(scriptType, expression, value);
-                    return new ActionValueImpl(valueKey, value);
+                    return new ActionValueImpl(valueKey, handleResult(scriptType, expression, value));
                 } else {
                     return null;
                 }

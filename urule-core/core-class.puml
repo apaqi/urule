@@ -26,10 +26,11 @@ interface KnowledgeSession{
     FlowExecutionResponse startProcess();
 }
 class KnowledgeSessionImpl{
-    -private Agenda agenda;
+    - Agenda agenda;
     RuleExecutionResponse fireRules();
     FlowExecutionResponse startProcess();
 }
+
 class Agenda{
  - List<RuleBox> ruleBoxes;
  - List<RuleInfo> matchedRules;
@@ -81,11 +82,45 @@ interface Action{
 class ExecuteMethodAction{
 }
 
+
+'''rete'''
+class ReteInstance{
+  Collection<FactTracker> enter()
+}
+
+class ObjectTypeActivity{
+    Collection<FactTracker> enter()
+}
+
+class AbstractActivity{
+  List<FactTracker> visitPahs()
+}
+
+interface Activity{
+  List<Path> getPaths();
+}
+
+class CriteriaActivity{
+ List<FactTracker> enter()
+}
+
+class Criteria{
+   EvaluateResponse evaluate()
+}
+
+interface LeftPart{
+}
+
+class ScriptMethodLeftPart{
+}
+
 KnowledgeSessionFactory --> KnowledgeSession
 WorkingMemory -->EventManager
 KnowledgeSession-->WorkingMemory
 KnowledgeSessionImpl --|> KnowledgeSession
 KnowledgeSessionImpl-->Agenda
+KnowledgeSessionImpl-->ReteInstance
+
 Agenda-->RuleBox
 AbstractRuleBox --|> RuleBox
 
@@ -99,9 +134,18 @@ ActivationRuleBox->ActivationImpl :execute
 ActivationImpl->Action :execute
 '''action 实现类'''
 ExecuteMethodAction --|> Action
+ScriptExecuteMethodAction --|> Action
 VariableAssignAction --|> Action
 ScoringAction --|> Action
 SimpleAction --|> Action
+'''rete'''
+ReteInstance -->ObjectTypeActivity
+ObjectTypeActivity -->AbstractActivity
+AbstractActivity --|>  Activity
+AbstractActivity-->CriteriaActivity
+CriteriaActivity --> Criteria
 
-
+Criteria --> LeftPart
+ScriptMethodLeftPart --|> LeftPart
+MethodLeftPart --|> LeftPart
 @enduml
