@@ -612,8 +612,8 @@ public class PackageServletHandler extends RenderPageServletHandler {
 	@SuppressWarnings({ "unchecked"})
 	public void doTest(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 		//testRuleGroup(req, resp);
-		testScriptMethodRule(req,  resp);
-		//doTest_back(req,  resp);
+		//testScriptMethodRule(req,  resp);
+		doTest_back(req,  resp);
  		System.out.println();
 	}
 
